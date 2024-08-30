@@ -1,0 +1,76 @@
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #74ABE2, #5563DE);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #ffffff;
+}
+#result {
+    color: #ff0000; /* Red color for the result text */
+    font-size: 18px; /* Optional: Adjusting the font size */
+    padding: 10px 0; /* Optional: Adds some padding above and below the text */
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+input[type="text"],
+input[type="file"] {
+    width: calc(100% - 22px);
+    padding: 12px;
+    border: 2px solid #5563DE;
+    border-radius: 6px;
+    display: block;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="file"]:focus {
+    border-color: #74ABE2;
+    outline: none;
+}
+
+button {
+    background-color: #5563DE;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+
+button:hover {
+    background-color: #404F9F;
+}

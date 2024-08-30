@@ -1,8 +1,56 @@
-import OpenAI from "openai";
-import fs from "fs/promises";
-import { config } from 'dotenv'
-config();
-const openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
+// import OpenAI from "/openai";
+// import fs from "/fs/promises";
+// import { config } from '/dotenv'
+// config();
+// const openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
+// import pdfjsLib from "/pdfjs-dist"
+
+
+
+
+//** prosses text input 
+
+document.getElementById('uploadForm').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevent the default form submission behavior
+    const username = document.getElementById('username').value;
+    const fileInput = document.getElementById('file').files[0];
+
+    try {
+        if (fileInput.type === 'application/pdf') {
+            const fileReader = new FileReader();
+
+            fileReader.onload = async function (event) {
+
+                const typedarray = new Uint8Array(event.target.result);
+
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                let textContent = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const text = await page.getTextContent();
+                    textContent += text.items.map(item => item.str).join(' ');
+                }
+                console.log(textContent); // Log the entire text content of the PDF
+                document.getElementById('result').textContent = `Hello, ${username}! Here is the text from your PDF.`;
+            }
+            fileReader.readAsArrayBuffer(fileInput);
+
+
+        }
+        const randomNumber = Math.floor(Math.random() * 100)
+
+        document.getElementById('result').textContent = `Hello, ${username}! Your random number is: ${randomNumber}`;
+
+    } catch (error) {
+
+    }
+
+})
+
+
+
+
+//** end of text prosses */
 
 
 extractFile().then(async text => {
