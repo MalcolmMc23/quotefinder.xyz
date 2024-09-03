@@ -1,8 +1,8 @@
-// import OpenAI from "/openai";
-// import fs from "/fs/promises";
-// import { config } from '/dotenv'
-// config();
-// const openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
+import OpenAI from "/openai";
+import fs from "/fs/promises";
+import { config } from '/dotenv'
+config();
+const openai = new OpenAI({ apiKey: process.env.OPEN_AI_KEY });
 // import pdfjsLib from "/pdfjs-dist"
 
 
@@ -31,7 +31,8 @@ document.getElementById('uploadForm').addEventListener('submit', async function 
                     textContent += text.items.map(item => item.str).join(' ');
                 }
                 console.log(textContent); // Log the entire text content of the PDF
-                document.getElementById('result').textContent = `Hello, ${username}! Here is the text from your PDF.`;
+                const quoteResponse = await main(textContent)
+                document.getElementById('result').textContent = `Hello ${username}! Here is the text from your PDF.  ${quoteResponse}`;
             }
             fileReader.readAsArrayBuffer(fileInput);
 
@@ -39,7 +40,7 @@ document.getElementById('uploadForm').addEventListener('submit', async function 
         }
         const randomNumber = Math.floor(Math.random() * 100)
 
-        document.getElementById('result').textContent = `Hello, ${username}! Your random number is: ${randomNumber}`;
+        // document.getElementById('result').textContent = `Hello, ${username}! Your random number is: ${randomNumber}`;
 
     } catch (error) {
 
@@ -53,23 +54,23 @@ document.getElementById('uploadForm').addEventListener('submit', async function 
 //** end of text prosses */
 
 
-extractFile().then(async text => {
-    try {
-        if (text.length < 1000) {
-            console.log(text)
-            throw new Error
-        }
-        let results = await main(text)
-        console.log(results)
-    } catch (error) {
-        console.log(error)
-    }
+// extractFile().then(async text => {
+//     try {
+//         if (text.length < 1000) {
+//             console.log(text)
+//             throw new Error
+//         }
+//         let results = await main(text)
+//         console.log(results)
+//     } catch (error) {
+//         console.log(error)
+//     }
 
-})
-async function extractFile() {
-    let text = await fs.readFile("/Users/malcolm/Documents/Documents - Malcolm’s MacBook Pro/MyProjects/QuoteFinder3/test.txt", "utf8");
-    return text
-}
+// })
+// async function extractFile() {
+//     let text = await fs.readFile("/Users/malcolm/Documents/Documents - Malcolm’s MacBook Pro/MyProjects/QuoteFinder3/test.txt", "utf8");
+//     return text
+// }
 
 
 async function main(text) {
