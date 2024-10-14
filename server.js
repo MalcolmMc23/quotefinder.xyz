@@ -2,11 +2,18 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { pool } = require('pg');
+require('dotenv').config()
+
 
 // Initialize the Express app
 const app = express();
 const port = 3000;
 
+// PostgreSQL connection setup
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+})
 
 app.use(express.static('client'));
 
@@ -49,6 +56,43 @@ app.get('/generate-response', async (req, res) => {
     const haiku = await generateResponse();
     res.send(haiku);
 });
+
+
+//! testing zone
+
+
+// Function to add a random number to the database
+async function addRandomNumber() {
+    const randomNumber = Math.floor(Math.random() * 100);
+    try {
+        const client = await pool.connect()
+        const result = await client.query(
+            'INSERT INTO random_numbers (number) VALUES ($1) RETURNING *',
+            [randomNumber]
+        );
+        client.release();
+        return result.rows[0];
+    } catch (error) {
+        console.error('Error adding random number to database', err);
+        throw err;
+    }
+}
+
+// New route to add a random number to the database
+app.get('/add-random-number', async (req, res) => {
+    try {
+        const result = await addRandomNumber();
+        res.json({ message: 'Random number added successfully', number: result.number })
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to add random number' });
+    }
+})
+
+
+
+
+
+//! end of testing zone
 
 // Start the server
 app.listen(port, () => {
