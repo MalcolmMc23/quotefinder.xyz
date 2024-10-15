@@ -7,12 +7,29 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <form id="uploadForm" action="/upload-pdf" method="post" enctype="multipart/form-data">
-        <h2>Upload a PDF File</h2>
-        <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
-        <button type="submit">Upload</button>
-        <p id="message"></p>
-    </form>
+    <!-- Google Login Button -->
+    <div id="auth-section">
+        <a href="/auth/google" id="login-button">Login with Google</a>
+    </div>
+
+    <!-- User Profile Section (hidden initially) -->
+    <div id="profile" style="display: none;">
+        <h2>User Profile</h2>
+        <p id="user-name"></p>
+        <p id="user-email"></p>
+        <img id="user-image" src="" alt="Profile Picture" />
+        <a href="/logout" id="logout-button">Logout</a>
+    </div>
+
+    <!-- PDF Upload Form (also hidden initially, shown after login) -->
+    <div id="upload-section" style="display: none;">
+        <form id="uploadForm" action="/upload-pdf" method="post" enctype="multipart/form-data">
+            <h2>Upload a PDF File</h2>
+            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+            <button type="submit">Upload</button>
+            <p id="message"></p>
+        </form>
+    </div>
 
     <script src="app.js"></script>
 </body>

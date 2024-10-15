@@ -3,6 +3,9 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { Pool } = require('pg');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
 require('dotenv').config()
 
 
@@ -15,7 +18,93 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 })
 
+// Middleware for sessions
+app.use(session({
+    secret: 'your-session-secret',
+    resave: false,
+    saveUninitialized: true,
+}));
+
+
+// Initialize Passport and restore authentication state, if any, from the session
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        const client = await pool.connect();
+        // Check if the user already exists in the database
+        const result = await client.query(
+            'SELECT * FROM users WHERE google_id = $1',
+            [profile.id]
+        );
+        let user = result.rows[0];
+
+        if (!user) {
+            // If user does not exist, insert a new user with a timestamp
+            const insertResult = await client.query(
+                'INSERT INTO users (google_id, name, email) VALUES ($1, $2, $3) RETURNING *',
+                [profile.id, profile.displayName, profile.emails[0].value]
+            );
+            user = insertResult.rows[0];  // This will include the created_at timestamp
+        }
+
+        client.release();
+        return done(null, user);  // Pass the user object to Passport
+    } catch (error) {
+        return done(error);
+    } finally {
+        client.release();  // Ensure the client is released regardless of success or failure
+    }
+}));
+passport.serializeUser((user, done) => {
+    done(null, user.id);  // Serialize user ID to session
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM users WHERE id = $1', [id]);
+        client.release();
+        done(null, result.rows[0]);  // Attach user object to request
+    } catch (error) {
+        done(error);
+    }
+});
+
+
+
+
 app.use(express.static('client'));
+
+
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/' }),
+    (req, res) => {
+        // Successful authentication
+        res.redirect('/');
+    }
+);
+
+function isAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/auth/google');
+}
+
+app.get('/profile', isAuthenticated, (req, res) => {
+    res.json({ user: req.user });
+});
+
 
 // Set up storage for uploaded files using Multer
 const storage = multer.diskStorage({
@@ -63,18 +152,18 @@ app.get('/generate-response', async (req, res) => {
 
 // Function to add a random number to the database
 async function addRandomNumber() {
-    const randomNumber = Math.floor(Math.random() * 100);
+    const randomNumber = Math.floor(Math.random() * 100);  // Generate a random number
     try {
-        const client = await pool.connect()
+        const client = await pool.connect();  // Get a client from the connection pool
         const result = await client.query(
             'INSERT INTO random_numbers (number) VALUES ($1) RETURNING *',
             [randomNumber]
         );
-        client.release();
-        return result.rows[0];
-    } catch (error) {
-        console.error('Error adding random number to database', err);
-        throw err;
+        client.release();  // Release the client back to the pool
+        return result.rows[0];  // Return the inserted row
+    } catch (error) {  // Catch and log the error (change err to error)
+        console.error('Error adding random number to database:', error);
+        throw error;  // Re-throw the error to propagate it to the caller
     }
 }
 
@@ -82,11 +171,12 @@ async function addRandomNumber() {
 app.get('/add-random-number', async (req, res) => {
     try {
         const result = await addRandomNumber();
-        res.json({ message: 'Random number added successfully', number: result.number })
+        res.json({ message: 'Random number added successfully', number: result.number });
     } catch (error) {
+        console.error('Error adding random number:', error);  // Log the actual error
         res.status(500).json({ error: 'Failed to add random number' });
     }
-})
+});
 
 
 
