@@ -86,13 +86,9 @@ app.get('/auth/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
-    (req, res) => {
-        // Successful authentication
-        res.redirect('/');
-    }
-);
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');  // Redirect to profile page after successful login
+});
 
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
