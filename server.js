@@ -20,9 +20,14 @@ const pool = new Pool({
 
 // Middleware for sessions
 app.use(session({
-    secret: 'your-session-secret',
+    secret: process.env.SESSION_SECRET, // Make sure this is a secure, long secret
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: {
+        secure: true, // Set this to true if you're using HTTPS
+        httpOnly: true,
+        sameSite: 'lax' // Adjust based on your setup
+    }
 }));
 
 
