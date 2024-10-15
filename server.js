@@ -63,7 +63,9 @@ passport.use(new GoogleStrategy({
     } catch (error) {
         return done(error);
     } finally {
-        client.release();  // Ensure the client is released regardless of success or failure
+        if (client) {  // Ensure client is defined before calling release
+            client.release();
+        }
     }
 }));
 passport.serializeUser((user, done) => {
