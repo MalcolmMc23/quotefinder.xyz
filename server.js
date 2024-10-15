@@ -40,6 +40,7 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL
 }, async (accessToken, refreshToken, profile, done) => {
+    console.log('Google profile:', profile);  // Add this to see the profile returned
     try {
         const client = await pool.connect();
         // Check if the user already exists in the database
@@ -58,7 +59,6 @@ passport.use(new GoogleStrategy({
             user = insertResult.rows[0];  // This will include the created_at timestamp
         }
 
-        client.release();
         return done(null, user);  // Pass the user object to Passport
     } catch (error) {
         return done(error);
