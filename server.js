@@ -97,7 +97,9 @@ app.get('/auth/google',
 );
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/profile');  // Automatically saves the session and redirects
+    req.session.save(() => {
+        res.redirect('/profile');  // Redirect to profile page after successful login
+    });
 });
 
 app.get('/error', (req, res) => {
