@@ -23,6 +23,8 @@ app.use(session({
     secret: process.env.SESSION_SECRET, // Make sure this is a secure, long secret
     resave: false,
     saveUninitialized: false,
+    rolling: true,  // Reset cookie expiration on each request
+
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
@@ -126,6 +128,8 @@ app.get('/logout', (req, res, next) => {
     });
 });
 
+
+
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
@@ -134,9 +138,15 @@ function isAuthenticated(req, res, next) {
 }
 
 app.get('/profile', isAuthenticated, (req, res) => {
-    res.json({ user: req.user });
+    const user = {
+        google_id: req.user.google_id,
+        name: req.user.name,
+        email: req.user.email,
+        profile_picture: req.user.profile_picture || req.user.photos?.[0]?.value,
+        created_at: req.user.created_at
+    };
+    res.json({ user });
 });
-
 
 // Set up storage for uploaded files using Multer
 const storage = multer.diskStorage({
