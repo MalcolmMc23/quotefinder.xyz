@@ -107,6 +107,25 @@ app.get('/error', (req, res) => {
     res.status(500).send('Authentication failed. Please try again.');
 });
 
+// Logout route
+app.get('/logout', (req, res, next) => {
+    // Passport's logout method
+    req.logout(err => {
+        if (err) {
+            return next(err);
+        }
+
+        // Destroy the session
+        req.session.destroy((err) => {
+            if (err) {
+                console.log('Error destroying session:', err);
+            }
+            // Redirect the user to the homepage or login page
+            res.redirect('/');
+        });
+    });
+});
+
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
