@@ -41,8 +41,10 @@ passport.use(new GoogleStrategy({
     callbackURL: process.env.GOOGLE_CALLBACK_URL
 }, async (accessToken, refreshToken, profile, done) => {
     console.log('Google profile:', profile);  // Add this to see the profile returned
+    let client;  // Declare client here to ensure it's in scope
     try {
-        const client = await pool.connect();
+        client = await pool.connect();  // Connect to the database
+
         // Check if the user already exists in the database
         const result = await client.query(
             'SELECT * FROM users WHERE google_id = $1',
@@ -61,7 +63,8 @@ passport.use(new GoogleStrategy({
 
         return done(null, user);  // Pass the user object to Passport
     } catch (error) {
-        return done(error);
+        console.error('Error during Google OAuth strategy:', error);  // Log the error
+        return done(error);  // Pass the error back to Passport
     } finally {
         if (client) {  // Ensure client is defined before calling release
             client.release();
@@ -93,10 +96,12 @@ app.get('/auth/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/error' }), (req, res) => {
-    req.session.save(() => {
-        res.redirect('/profile');  // Redirect to profile page after successful login
-    });
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');  // Automatically saves the session and redirects
+});
+
+app.get('/error', (req, res) => {
+    res.status(500).send('Authentication failed. Please try again.');
 });
 
 function isAuthenticated(req, res, next) {
