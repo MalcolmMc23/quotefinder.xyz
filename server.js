@@ -2,24 +2,21 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const bcrypt = require('bcrypt'); // For password hashing
 const { Pool } = require('pg');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
-require('dotenv').config();
+require('dotenv').config()
+
 
 // Initialize the Express app
 const app = express();
 const port = 3000;
 
-app.use(express.urlencoded({ extended: true }));  // To parse form data
-app.use(express.json());  // To parse JSON data
-
 // PostgreSQL connection setup
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-});
+})
 
 // Middleware for sessions
 app.use(session({
@@ -27,12 +24,14 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     rolling: true,  // Reset cookie expiration on each request
+
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         sameSite: 'lax' // Adjust based on your setup
     }
 }));
+
 
 // Initialize Passport and restore authentication state, if any, from the session
 app.use(passport.initialize());
@@ -43,10 +42,10 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.GOOGLE_CALLBACK_URL
 }, async (accessToken, refreshToken, profile, done) => {
-    console.log('Google profile:', profile);
-    let client;
+    console.log('Google profile:', profile);  // Add this to see the profile returned
+    let client;  // Declare client here to ensure it's in scope
     try {
-        client = await pool.connect();
+        client = await pool.connect();  // Connect to the database
 
         // Check if the user already exists in the database
         const result = await client.query(
@@ -61,20 +60,19 @@ passport.use(new GoogleStrategy({
                 'INSERT INTO users (google_id, name, email) VALUES ($1, $2, $3) RETURNING *',
                 [profile.id, profile.displayName, profile.emails[0].value]
             );
-            user = insertResult.rows[0];
+            user = insertResult.rows[0];  // This will include the created_at timestamp
         }
 
-        return done(null, user);
+        return done(null, user);  // Pass the user object to Passport
     } catch (error) {
-        console.error('Error during Google OAuth strategy:', error);
-        return done(error);
+        console.error('Error during Google OAuth strategy:', error);  // Log the error
+        return done(error);  // Pass the error back to Passport
     } finally {
-        if (client) {
+        if (client) {  // Ensure client is defined before calling release
             client.release();
         }
     }
 }));
-
 passport.serializeUser((user, done) => {
     done(null, user.id);  // Serialize user ID to session
 });
@@ -84,94 +82,54 @@ passport.deserializeUser(async (id, done) => {
         const client = await pool.connect();
         const result = await client.query('SELECT * FROM users WHERE id = $1', [id]);
         client.release();
-        done(null, result.rows[0]);
+        done(null, result.rows[0]);  // Attach user object to request
     } catch (error) {
         done(error);
     }
 });
 
+
+
+
 app.use(express.static('client'));
 
-// Registration route (Email + Password)
-app.post('/register', async (req, res) => {
-    const { email, password, name } = req.body;
-    const saltRounds = 10;
 
-    try {
-        const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (userResult.rows.length > 0) {
-            return res.status(400).json({ message: 'Email already registered' });
-        }
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
 
-        const passwordHash = await bcrypt.hash(password, saltRounds);
-
-        const newUser = await pool.query(
-            'INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING *',
-            [email, passwordHash, name]
-        );
-
-        req.login(newUser.rows[0], (err) => {
-            if (err) return res.status(500).json({ error: err.message });
-            return res.redirect('/profile');
-        });
-    } catch (error) {
-        console.error('Error during registration:', error);
-        return res.status(500).send('Server error');
-    }
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
+    console.log('Session:', req.session);  // Check the session details
+    req.session.save(() => {
+        res.redirect('/profile');  // Redirect after login
+    });
 });
 
-// Login route (Email + Password)
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        // Check if the email is registered
-        const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        const user = userResult.rows[0];
-
-        if (!user) {
-            console.log('Login failed: Email not found');
-            return res.status(400).json({ message: 'Invalid email or password' });
-        }
-
-        // Compare the password
-        const match = await bcrypt.compare(password, user.password_hash);
-        if (!match) {
-            console.log('Login failed: Invalid password');
-            return res.status(400).json({ message: 'Invalid email or password' });
-        }
-
-        // Log the user in
-        req.login(user, (err) => {
-            if (err) {
-                console.log('Login failed: Error during login session', err);
-                return res.status(500).json({ message: 'Login failed. Please try again later.' });
-            }
-            console.log('Login successful for user:', user.email);
-            return res.redirect('/profile'); // This can also be `res.json({ message: 'Login successful' })`
-        });
-    } catch (error) {
-        console.error('Error during login:', error);
-        return res.status(500).json({ message: 'Server error. Please try again later.' });
-    }
+app.get('/error', (req, res) => {
+    res.status(500).send('Authentication failed. Please try again.');
 });
 
 // Logout route
 app.get('/logout', (req, res, next) => {
+    // Passport's logout method
     req.logout(err => {
         if (err) {
             return next(err);
         }
+
+        // Destroy the session
         req.session.destroy((err) => {
             if (err) {
                 console.log('Error destroying session:', err);
             }
+            // Redirect the user to the homepage or login page
             res.redirect('/');
         });
     });
 });
 
-// Ensure user is authenticated
+
+
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
@@ -195,7 +153,91 @@ app.get('/api/profile', isAuthenticated, (req, res) => {
     res.json({ user });
 });
 
+// Set up storage for uploaded files using Multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        const uploadPath = path.join(__dirname, '/uploads/');
+        // Ensure the upload path directory exists
+        fs.mkdirSync(uploadPath, { recursive: true });
+        cb(null, uploadPath);
+    },
+    filename: function (req, file, cb) {
+        // Use the original file name
+        cb(null, file.originalname);
+    }
+});
+
+// Set up file filter to accept only PDFs
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+    } else {
+        cb(new Error('Only PDF files are allowed!'), false);
+    }
+};
+
+// Create a Multer instance with the storage engine and file filter
+const upload = multer({ storage: storage, fileFilter: fileFilter });
+
+// Define a route for file uploads
+app.post('/upload-pdf', upload.single('pdfFile'), (req, res) => {
+    if (req.file) {
+        res.send("PDF uploaded successfully!");
+    } else {
+        res.status(400).send("No PDF file uploaded.");
+    }
+});
+
+app.get('/generate-response', async (req, res) => {
+    const haiku = await generateResponse();
+    res.send(haiku);
+});
+
+
+//! testing zone
+
+
+// Function to add a random number to the database
+async function addRandomNumber() {
+    const randomNumber = Math.floor(Math.random() * 100);  // Generate a random number
+    try {
+        const client = await pool.connect();  // Get a client from the connection pool
+        const result = await client.query(
+            'INSERT INTO random_numbers (number) VALUES ($1) RETURNING *',
+            [randomNumber]
+        );
+        client.release();  // Release the client back to the pool
+        return result.rows[0];  // Return the inserted row
+    } catch (error) {  // Catch and log the error (change err to error)
+        console.error('Error adding random number to database:', error);
+        throw error;  // Re-throw the error to propagate it to the caller
+    }
+}
+
+// New route to add a random number to the database
+app.get('/add-random-number', async (req, res) => {
+    try {
+        const result = await addRandomNumber();
+        res.json({ message: 'Random number added successfully', number: result.number });
+    } catch (error) {
+        console.error('Error adding random number:', error);  // Log the actual error
+        res.status(500).json({ error: 'Failed to add random number' });
+    }
+});
+
+
+
+
+
+//! end of testing zone
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+
+
+async function generateResponse() {
+    return "Hello"
+}
