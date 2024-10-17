@@ -15,10 +15,39 @@ header {
 header .container {
     width: 85%;
     margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 header .logo h1 {
     margin: 0;
+}
+
+header .login-signup {
+    display: flex;
+    align-items: center;
+}
+
+header .login-signup button {
+    background-color: #ff9900;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+}
+
+header .login-signup button i {
+    margin-right: 8px;
+    font-size: 20px;
+}
+
+header .login-signup button:hover {
+    background-color: #e68a00;
 }
 
 /* Main content styles */
@@ -32,28 +61,9 @@ main {
     color: #333;
 }
 
-/* Auth section styles */
-#auth-section {
-    margin: 20px 0;
-}
-
-#auth-section button {
-    background-color: #ff9900;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-#auth-section button:hover {
-    background-color: #e68a00;
-}
-
 /* Profile section styles */
 #profile {
     margin: 20px auto;
-    width: 60%;
     text-align: center;
 }
 
@@ -71,7 +81,7 @@ main {
     margin: 10px 0;
 }
 
-#profile #logout-button {
+#logout-button {
     display: inline-block;
     background-color: #ff3333;
     color: #fff;
@@ -80,7 +90,7 @@ main {
     border-radius: 4px;
 }
 
-#profile #logout-button:hover {
+#logout-button:hover {
     background-color: #cc0000;
 }
 
@@ -127,13 +137,16 @@ main {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
     background-color: rgba(0,0,0,0.5);
+
+    /* Flexbox for centering */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .modal-content {
     background-color: #fff;
-    margin: 5% auto;
     padding: 20px;
     border-radius: 4px;
     width: 80%;
@@ -146,6 +159,12 @@ main {
     margin-top: 0;
 }
 
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .modal-content button {
     margin: 10px 0;
     padding: 10px 15px;
@@ -154,66 +173,85 @@ main {
     cursor: pointer;
 }
 
-.modal-content button#googleSignIn {
+#googleSignIn {
     background-color: #db4437;
     color: #fff;
     border: none;
 }
 
-.modal-content button#emailSignIn {
+#emailSignIn {
     background-color: #4285f4;
     color: #fff;
     border: none;
 }
 
-.modal-content .close-button {
+.close-button {
     position: absolute;
     top: 10px;
     right: 15px;
     color: #aaa;
     font-size: 28px;
     font-weight: bold;
+    background: none;
+    border: none;
     cursor: pointer;
 }
 
-.modal-content .close-button:hover,
-.modal-content .close-button:focus {
+.close-button:hover,
+.close-button:focus {
     color: #000;
     text-decoration: none;
     cursor: pointer;
 }
 
-/* Email Login Form Styles */
-#emailLoginForm input {
-    width: 80%;
-    padding: 10px;
+/* Removed back-button styles */
+
+/* Social login buttons */
+.social-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.social-login-btn i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* Remember me checkbox */
+.remember-me {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 10px 0;
-    font-size: 16px;
 }
 
-#emailLoginForm button#submitEmailLogin {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    width: 80%;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
+.remember-me input {
+    margin-right: 5px;
 }
 
-#emailLoginForm button#submitEmailLogin:hover {
-    background-color: #218838;
-}
-
-#emailLoginMessage {
+/* Forgot Password link */
+#forgotPassword {
+    display: block;
     margin-top: 10px;
-    color: red;
+    color: #4285f4;
+    text-decoration: none;
+}
+
+#forgotPassword:hover {
+    text-decoration: underline;
+}
+
+/* Input focus styles */
+input:focus, button:focus {
+    outline: 2px solid #4285f4;
+    outline-offset: 2px;
 }
 
 /* Responsive */
 @media screen and (max-width: 600px) {
     header .container {
-        text-align: center;
+        flex-direction: column;
     }
 
     #profile, #upload-section {

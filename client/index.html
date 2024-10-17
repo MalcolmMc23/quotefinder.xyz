@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Include CSS file -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
 
@@ -14,6 +16,9 @@
         <div class="container">
             <div class="logo">
                 <h1>QuoteFinder</h1>
+            </div>
+            <div class="login-signup">
+                <button id="loginSignupBtn"><i class="fas fa-user"></i> Login / Sign Up</button>
             </div>
         </div>
     </header>
@@ -26,7 +31,7 @@
 
         <!-- Auth Section -->
         <div id="auth-section">
-            <button id="loginSignupBtn">Login/Sign Up</button>
+            <!-- The login button is already in the header -->
         </div>
 
         <!-- User Profile Section (hidden initially) -->
@@ -51,21 +56,33 @@
     </main>
 
     <!-- Login/Signup Modal -->
-    <div id="loginModal" class="modal">
+    <div id="loginModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
-            <span class="close-button" id="closeModal">&times;</span>
+            <!-- Removed the close button here -->
+            <!-- Modal Content -->
             <div id="modal-main-content">
-                <h2>Sign In</h2>
+                <h2 id="modalTitle">Sign In</h2>
                 <p>Please choose a method to sign in:</p>
-                <button id="googleSignIn">Sign in with Google</button>
-                <button id="emailSignIn">Sign in with Email</button>
+                <div class="modal-buttons">
+                    <button id="googleSignIn" class="social-login-btn google-btn">
+                        <i class="fab fa-google"></i> Sign in with Google
+                    </button>
+                    <button id="emailSignIn" class="social-login-btn email-btn">
+                        <i class="fas fa-envelope"></i> Sign in with Email
+                    </button>
+                </div>
             </div>
             <!-- Email Login Form (hidden initially) -->
             <div id="emailLoginForm" style="display: none;">
                 <h2>Email Sign In</h2>
-                <input type="email" id="emailInput" placeholder="Email Address" required>
-                <input type="password" id="passwordInput" placeholder="Password" required>
+                <input type="email" id="emailInput" placeholder="Email Address" required aria-label="Email Address">
+                <input type="password" id="passwordInput" placeholder="Password" required aria-label="Password">
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
                 <button id="submitEmailLogin">Sign In</button>
+                <a href="#" id="forgotPassword">Forgot Password?</a>
                 <p id="emailLoginMessage"></p>
             </div>
         </div>
