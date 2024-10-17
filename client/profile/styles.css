@@ -1,0 +1,98 @@
+/* General styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+/* Header styles */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+}
+
+header .container {
+    width: 85%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header .logo h1 {
+    margin: 0;
+}
+
+header .logout a {
+    color: #fff;
+    text-decoration: none;
+    background-color: #ff3333;
+    padding: 10px 15px;
+    border-radius: 4px;
+}
+
+header .logout a:hover {
+    background-color: #cc0000;
+}
+
+/* Main content styles */
+main {
+    margin-top: 50px;
+    text-align: center;
+}
+
+/* Profile section styles */
+#profile {
+    margin: 20px auto;
+    text-align: center;
+}
+
+#profile img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+}
+
+#profile h2 {
+    font-size: 28px;
+}
+
+#profile p {
+    font-size: 18px;
+}
+
+/* Input section styles */
+.input-section {
+    margin: 40px auto;
+}
+
+.input-section input[type="text"] {
+    width: 300px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.input-section button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.input-section button:hover {
+    background-color: #218838;
+}
+
+/* Responsive */
+@media screen and (max-width: 600px) {
+    header .container {
+        flex-direction: column;
+    }
+
+    .input-section input[type="text"] {
+        width: 80%;
+    }
+}

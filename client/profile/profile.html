@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Website Name - Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Include CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Your Website Name</h1>
+            </div>
+            <div class="logout">
+                <a href="/logout" id="logout-button">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main>
+        <!-- Profile Section -->
+        <div id="profile">
+            <img id="profile-picture" src="" alt="Profile Picture">
+            <h2 id="user-name">User Name</h2>
+            <p>Email: <span id="user-email"></span></p>
+            <p>Google ID: <span id="google-id"></span></p>
+            <p>Account Created At: <span id="created-at"></span></p>
+        </div>
+
+        <!-- Centered Input Box -->
+        <div class="input-section">
+            <input type="text" id="userInput" placeholder="Enter text here">
+            <button id="submitButton">Submit</button>
+        </div>
+    </main>
+
+    <!-- Include JavaScript file -->
+    <script src="app.js"></script>
+</body>
+</html>

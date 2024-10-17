@@ -2,35 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Your Website Name</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Upload Form</title>
+    <!-- Include CSS file -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Google Login Button -->
-    <div id="auth-section">
-        <a href="/auth/google" id="login-button">Login with Google</a>
+
+    <!-- Header section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Your Website Name</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main>
+        <div class="page-title">
+            <h2>Welcome to Our Website</h2>
+        </div>
+
+        <!-- Auth Section -->
+        <div id="auth-section">
+            <button id="loginSignupBtn">Login/Sign Up</button>
+        </div>
+
+        <!-- User Profile Section (hidden initially) -->
+        <div id="profile" style="display: none;">
+            <h2>User Profile</h2>
+            <p id="user-name"></p>
+            <p id="user-email"></p>
+            <img id="user-image" src="" alt="Profile Picture" />
+            <a href="/logout" id="logout-button">Logout</a>
+        </div>
+
+        <!-- PDF Upload Form (also hidden initially, shown after login) -->
+        <div id="upload-section" style="display: none;">
+            <form id="uploadForm" action="/upload-pdf" method="post" enctype="multipart/form-data">
+                <h2>Upload a PDF File</h2>
+                <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                <button type="submit">Upload</button>
+                <p id="message"></p>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Login/Signup Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            <div id="modal-main-content">
+                <h2>Sign In</h2>
+                <p>Please choose a method to sign in:</p>
+                <button id="googleSignIn">Sign in with Google</button>
+                <button id="emailSignIn">Sign in with Email</button>
+            </div>
+            <!-- Email Login Form (hidden initially) -->
+            <div id="emailLoginForm" style="display: none;">
+                <h2>Email Sign In</h2>
+                <input type="email" id="emailInput" placeholder="Email Address" required>
+                <input type="password" id="passwordInput" placeholder="Password" required>
+                <button id="submitEmailLogin">Sign In</button>
+                <p id="emailLoginMessage"></p>
+            </div>
+        </div>
     </div>
 
-    <!-- User Profile Section (hidden initially) -->
-    <div id="profile" style="display: none;">
-        <h2>User Profile</h2>
-        <p id="user-name"></p>
-        <p id="user-email"></p>
-        <img id="user-image" src="" alt="Profile Picture" />
-        <a href="/logout" id="logout-button">Logout</a>
-    </div>
-
-    <!-- PDF Upload Form (also hidden initially, shown after login) -->
-    <div id="upload-section" style="display: none;">
-        <form id="uploadForm" action="/upload-pdf" method="post" enctype="multipart/form-data">
-            <h2>Upload a PDF File</h2>
-            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
-            <button type="submit">Upload</button>
-            <p id="message"></p>
-        </form>
-    </div>
-
+    <!-- Include JavaScript file -->
     <script src="app.js"></script>
 </body>
 </html>

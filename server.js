@@ -138,7 +138,7 @@ function isAuthenticated(req, res, next) {
 }
 
 app.get('/profile', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'profile.html'));
+    res.sendFile(path.join(__dirname, 'client', 'profile/profile.html'));
 });
 
 // Serve user data as JSON for the client-side JavaScript to fetch
