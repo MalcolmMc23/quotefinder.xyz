@@ -30,3 +30,67 @@ document.getElementById('submitButton').onclick = function () {
     console.log('User input:', userInput);
     // You can implement your own functionality here
 };
+
+// Open the sidebar
+function openNav() {
+    document.getElementById("sidebar").style.width = "250px";
+    document.getElementById("main").style.marginRight = "250px";
+}
+
+// Close the sidebar
+function closeNav() {
+    document.getElementById("sidebar").style.width = "0";
+    document.getElementById("main").style.marginRight = "0";
+}
+
+// Handle the burger menu button click
+document.getElementById('burger-button').onclick = function () {
+    openNav();
+};
+
+// Add these functions to your existing JavaScript file
+
+// Show the logout confirmation modal
+function showLogoutModal() {
+    const modal = document.getElementById('logoutModal');
+    modal.style.display = 'flex';
+}
+
+// Hide the logout confirmation modal
+function hideLogoutModal() {
+    const modal = document.getElementById('logoutModal');
+    modal.style.display = 'none';
+}
+
+// Handle logout confirmation
+function handleLogout() {
+    // Perform logout action here
+    console.log('Logging out...');
+    // Redirect to home page or perform any other logout actions
+    window.location.href = '/logout';
+}
+
+// Add event listeners when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('logoutModal');
+    const logoutLink = document.querySelector('.sidebar a[href="/logout"]');
+
+    // Add click event listener to the logout link
+    logoutLink.addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent the default link behavior
+        showLogoutModal();
+    });
+
+    // Add click event listener to the confirm logout button
+    document.getElementById('confirmLogout').addEventListener('click', handleLogout);
+
+    // Add click event listener to the cancel logout button
+    document.getElementById('cancelLogout').addEventListener('click', hideLogoutModal);
+
+    // Close the modal when clicking outside of it
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+            hideLogoutModal();
+        }
+    });
+});

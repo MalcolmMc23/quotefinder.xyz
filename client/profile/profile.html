@@ -6,22 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Include CSS file -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="#"><i class="fas fa-user"></i> Profile</a>
+        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
     <!-- Header section -->
     <header>
         <div class="container">
             <div class="logo">
                 <h1>QuoteFinder</h1>
             </div>
-            <div class="logout">
-                <a href="/logout" id="logout-button">Logout</a>
+            <div class="burger-menu">
+                <button id="burger-button" onclick="openNav()"><i class="fas fa-bars"></i> Menu</button>
             </div>
         </div>
     </header>
 
     <!-- Main content -->
-    <main>
+    <main id="main">
+        <div class="page-title">
+            <h2>User Profile</h2>
+        </div>
+
         <!-- Profile Section -->
         <div id="profile">
             <img id="profile-picture" src="" alt="Profile Picture">
@@ -40,5 +54,18 @@
 
     <!-- Include JavaScript file -->
     <script src="app.js"></script>
+
+    <!-- Add this just before the closing </body> tag -->
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Logout</h2>
+            <p>Are you sure you want to log out?</p>
+            <div class="modal-buttons">
+                <button id="confirmLogout" class="btn">Yes, Logout</button>
+                <button id="cancelLogout" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

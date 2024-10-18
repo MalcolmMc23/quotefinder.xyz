@@ -15,8 +15,10 @@ const port = 3000;
 
 // PostgreSQL connection setup
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    // connectionString: process.env.DATABASE_URL,
+    connectionString: "postgres://postgres:tuxHwpjgC6tuul9Q1sfZwQxnB647nLRtw72LrUIHPVJXj8pTif8jFC3LP77D7wuL@5.78.79.99:9000/postgres"
 })
+
 
 // Middleware for sessions
 app.use(session({
@@ -40,7 +42,9 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL
+    // callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    callbackURL: "http://localhost:3000/auth/google/callback"
+
 }, async (accessToken, refreshToken, profile, done) => {
     console.log('Google profile:', profile);  // Add this to see the profile returned
     let client;  // Declare client here to ensure it's in scope
