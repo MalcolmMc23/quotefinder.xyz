@@ -2,12 +2,13 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #1e1e1e; /* Dark background */
+    color: #f1f1f1; /* Light text */
 }
 
 /* Header styles */
 header {
-    background-color: #333;
+    background-color: #1e1e1e; /* Same as body */
     color: #fff;
     padding: 10px 0;
 }
@@ -58,7 +59,7 @@ main {
 
 .page-title h2 {
     font-size: 36px;
-    color: #333;
+    color: #f1f1f1; /* Light text */
 }
 
 /* Profile section styles */
@@ -69,10 +70,12 @@ main {
 
 #profile h2 {
     font-size: 28px;
+    color: #f1f1f1; /* Light text */
 }
 
 #profile p {
     font-size: 18px;
+    color: #f1f1f1; /* Light text */
 }
 
 #profile img {
@@ -103,6 +106,7 @@ main {
 
 #upload-section h2 {
     font-size: 28px;
+    color: #f1f1f1; /* Light text */
 }
 
 #upload-section input[type="file"] {
@@ -125,7 +129,7 @@ main {
 #upload-section #message {
     margin-top: 20px;
     font-size: 16px;
-    color: #333;
+    color: #f1f1f1; /* Light text */
 }
 
 /* Modal styles */
@@ -137,7 +141,7 @@ main {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(30, 30, 30, 0.9); /* Dark, slightly transparent */
 
     /* Flexbox for centering */
     display: flex;
@@ -146,13 +150,18 @@ main {
 }
 
 .modal-content {
-    background-color: #fff;
+    background-color: #1e1e1e; /* Same as body */
+    color: #f1f1f1; /* Light text */
     padding: 20px;
-    border-radius: 4px;
+    border-radius: 8px; /* Rounded corners */
     width: 80%;
     max-width: 400px;
     text-align: center;
     position: relative;
+    
+    /* Add border */
+    border: 3px solid #4285f4; /* Thicker blue border */
+    box-shadow: 0 0 15px rgba(66, 133, 244, 0.4); /* Blue glow */
 }
 
 .modal-content h2 {
@@ -257,4 +266,41 @@ input:focus, button:focus {
     #profile, #upload-section {
         width: 90%;
     }
+}
+
+/* Ensure all text is light */
+h1, h2, h3, h4, h5, h6, p, label, a {
+    color: #f1f1f1;
+}
+
+/* Keep buttons distinct */
+button, .btn, #logout-button {
+    /* Existing button styles */
+    color: #fff;
+}
+
+/* You may want to adjust specific button colors */
+#loginSignupBtn, #scrollToBottomBtn {
+    background-color: #ff9900; /* Orange */
+}
+
+#googleSignIn {
+    background-color: #db4437; /* Google red */
+}
+
+#emailSignIn {
+    background-color: #4285f4; /* Google blue */
+}
+
+#upload-section button {
+    background-color: #28a745; /* Green */
+}
+
+#logout-button {
+    background-color: #ff3333; /* Red */
+}
+
+/* Hover effects for buttons */
+button:hover, .btn:hover, #logout-button:hover {
+    opacity: 0.8;
 }
