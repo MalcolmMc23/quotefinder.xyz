@@ -58,3 +58,29 @@ document.getElementById('submitEmailLogin').onclick = async function () {
 document.addEventListener('DOMContentLoaded', async function () {
     // ... (Existing code for fetching user profile data)
 });
+
+// Typing animation
+document.addEventListener('DOMContentLoaded', function () {
+    const text = `"You're a wizzard Harry"`;
+    const typingElement = document.getElementById('animated-text');
+    const typingDelay = 100; // Delay between each character (in milliseconds)
+    const startDelay = 1000; // 5 seconds delay before starting the animation
+
+    function typeText(text, element, delay) {
+        let charIndex = 0;
+        function typeChar() {
+            if (charIndex < text.length) {
+                element.textContent += text.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeChar, delay);
+            }
+        }
+
+        typeChar();
+    }
+
+    // Add a delay before starting the typing animation
+    setTimeout(function () {
+        typeText(text, typingElement, typingDelay);
+    }, startDelay);
+});

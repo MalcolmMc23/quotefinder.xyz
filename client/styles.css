@@ -10,7 +10,7 @@ body {
 header {
     background-color: #1e1e1e; /* Same as body */
     color: #fff;
-    padding: 10px 0;
+    padding: 20px 0; /* Increased padding */
 }
 
 header .container {
@@ -23,18 +23,20 @@ header .container {
 
 header .logo h1 {
     margin: 0;
+    padding-top: 10px; /* Added padding to lower the title */
 }
 
 header .login-signup {
     display: flex;
     align-items: center;
+    padding-top: 10px; /* Added padding to lower the button */
 }
 
 header .login-signup button {
     background-color: #ff9900;
     color: #fff;
     border: none;
-    padding: 10px 15px;
+    padding: 12px 18px; /* Slightly increased padding */
     cursor: pointer;
     font-size: 18px;
     display: flex;
@@ -58,8 +60,9 @@ main {
 }
 
 .page-title h2 {
-    font-size: 36px;
+    font-size: 48px;
     color: #f1f1f1; /* Light text */
+    margin-bottom: 20px; /* Added margin for spacing */
 }
 
 /* Profile section styles */
@@ -303,4 +306,55 @@ button, .btn, #logout-button {
 /* Hover effects for buttons */
 button:hover, .btn:hover, #logout-button:hover {
     opacity: 0.8;
+}
+
+/* Typing animation styles */
+.typing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0; /* Increased top and bottom margin */
+    padding-top: 20px; /* Added top padding */
+}
+
+.prompt-section {
+    font-size: 1.5em;
+    margin-bottom: 20px; /* Increased bottom margin */
+}
+
+.prompt-text {
+    font-weight: bold;
+}
+
+.quote-text {
+    font-style: italic;
+}
+
+.typing-text {
+    position: relative;
+    white-space: nowrap;
+    font-size: 2em;
+    line-height: 1.3;
+}
+
+.typing-text::after {
+    content: '|';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-55%);
+    color: #ff9900; /* Cursor color */
+    animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+    from, to { opacity: 0 }
+    50% { opacity: 1 }
+}
+
+/* Added media query for smaller screens */
+@media screen and (max-width: 768px) {
+    .page-title h2 {
+        font-size: 36px; /* Smaller size for mobile devices */
+    }
 }
