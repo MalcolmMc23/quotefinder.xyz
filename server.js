@@ -94,9 +94,10 @@ passport.deserializeUser(async (id, done) => {
 app.use(express.static('client'));
 
 
-app.get('/auth/google',
-    passport.authenticate('google', { scope: ['profile', 'email'] })
-);
+app.get('/auth/google', (req, res, next) => {
+    console.log('Google OAuth route hit');
+    next();
+}, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
     console.log('Session:', req.session);  // Check the session details
