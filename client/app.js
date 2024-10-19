@@ -84,3 +84,38 @@ document.addEventListener('DOMContentLoaded', function () {
         typeText(text, typingElement, typingDelay);
     }, startDelay);
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const floatingTexts = document.querySelectorAll('.floating-text');
+    const numTexts = floatingTexts.length;
+    const zoneHeight = 100 / numTexts; // Height of each zone in percentage
+
+    floatingTexts.forEach((text, index) => {
+        // Vertical position within its zone
+        const zoneTop = index * zoneHeight;
+        const zoneBottom = (index + 1) * zoneHeight;
+        const top = zoneTop + Math.random() * (zoneBottom - zoneTop);
+        text.style.top = `${top}%`;
+
+        // Random start position (left or right)
+        const startSide = Math.random() < 0.5 ? 'left' : 'right';
+        text.style[startSide] = '-50%';
+        text.style[startSide === 'left' ? 'right' : 'left'] = 'auto';
+
+        // Random animation duration
+        const duration = Math.random() * 10 + 25; // 25s to 35s
+        text.style.animationDuration = `${duration}s`;
+
+        // Random delay
+        const delay = Math.random() * -15;
+        text.style.animationDelay = `${delay}s`;
+
+        // Set animation direction
+        text.style.animationName = startSide === 'left' ? 'float' : 'float-reverse';
+
+        // Random slight up or down movement (reduced range)
+        const maxMovement = zoneHeight / 4; // Limit movement to 1/4 of the zone height
+        const yMovement = (Math.random() * 2 - 1) * maxMovement; // -maxMovement to +maxMovement
+        text.style.setProperty('--y-movement', `${yMovement}vh`);
+    });
+});
