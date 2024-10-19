@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
 // Typing animation
 document.addEventListener('DOMContentLoaded', function () {
-    const text = `"You're a wizzard Harry"`;
+    const text = `"You're a wizzard Harry" (Rowling 39)`;
     const typingElement = document.getElementById('animated-text');
     const typingDelay = 100; // Delay between each character (in milliseconds)
     const startDelay = 1000; // 5 seconds delay before starting the animation
