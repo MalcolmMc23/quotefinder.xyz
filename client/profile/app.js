@@ -94,3 +94,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+// Show the profile popup with user information
+function showProfilePopup() {
+    const profilePopup = document.getElementById('profilePopup');
+    const userName = document.getElementById('user-name').innerText;
+    const userEmail = document.getElementById('user-email').innerText;
+    const googleId = document.getElementById('google-id').innerText;
+    const createdAt = document.getElementById('created-at').innerText;
+
+    // Populate the popup with user information
+    profilePopup.querySelector('.modal-content h2').innerText = userName; // Set the title to the user's name
+    profilePopup.querySelector('.modal-content p').innerText = `Email: ${userEmail}\nGoogle ID: ${googleId}\nAccount Created At: ${createdAt}`;
+
+    profilePopup.style.display = 'flex';
+}
+
+// Add event listener to the profile link
+document.querySelector('.sidebar a[href="#"]').addEventListener('click', function (e) {
+    e.preventDefault(); // Prevent the default link behavior
+    showProfilePopup();
+});

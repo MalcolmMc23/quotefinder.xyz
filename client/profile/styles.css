@@ -266,3 +266,30 @@ input:focus, button:focus {
 .modal-buttons button:hover {
     opacity: 0.8;
 }
+
+/* Profile Popup styles */
+#profilePopup {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(30, 30, 30, 0.9);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #1e1e1e;
+    color: #f1f1f1;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    border: 3px solid #4285f4;
+    box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);
+}
