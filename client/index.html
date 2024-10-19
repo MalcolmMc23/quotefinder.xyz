@@ -8,73 +8,100 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Include Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Additional styles for positioning */
+        body {
+            margin: 0; /* Remove default body margin */
+            overflow: hidden; /* Prevent scrollbars from appearing */
+        }
+        #canvas-container {
+            position: absolute; /* Position the canvas container absolutely */
+            top: 0; /* Align to the top of the page */
+            left: 0; /* Align to the left of the page */
+            width: 100vw; /* Set the width to 100% of the viewport width */
+            height: 100vh; /* Set the height to 100% of the viewport height */
+        }
+        #drawingCanvas {
+            border: 1px solid #000;
+            width: 100%; /* Make canvas fill the container */
+            height: 100%; /* Make canvas fill the container */
+            z-index: 0; /* Ensure canvas is behind the content */
+        }
+        #content {
+            position: absolute; /* Position content absolutely over the canvas */
+            top: 20px; /* Adjust this value to move content down */
+            left: 0; /* Align content to the left */
+            width: 100%; /* Make content fill the width of the canvas */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* Align content to the top */
+            align-items: center; /* Center content horizontally */
+            color: white; /* Change text color for visibility */
+            z-index: 1; /* Ensure content is above the canvas */
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Updated floating text container with more diverse quotes -->
-    <div class="floating-text-container">
-        <div class="floating-text">"Hello, world!"</div>
-        <div class="floating-text">"To be or not to be"</div>
-        <div class="floating-text">"I think, therefore I am"</div>
-        <div class="floating-text">"Stay hungry, stay foolish"</div>
-        <div class="floating-text">"Carpe diem"</div>
-        <div class="floating-text">"Just do it"</div>
-        <div class="floating-text">"Hi Beckett"</div>
-
-    </div>
-
-    <!-- Header section -->
-    <header>
-        <div class="container">
-            <div class="logo">
-                <h1>QuoteFinder</h1>
-            </div>
-            <div class="login-signup">
-                <button id="loginSignupBtn"><i class="fas fa-user"></i> Login / Sign Up</button>
-            </div>
-        </div>
-    </header>
-
     <!-- Main content -->
     <main>
-        <div class="page-title">
-            <h2>Welcome to QuoteFinder</h2>
-        </div>
+        <div id="canvas-container">
+            <!-- Canvas for drawing lines and squares -->
+            <canvas id="drawingCanvas"></canvas>
 
-        <!-- Update the typing animation div -->
-        <div id="typing-animation" class="typing-container">
-            <div class="prompt-section">
-                <span class="prompt-text">Prompt: </span>
-                <span class="quote-text">"Quotes of harry potter making his new home at Hogwarts."</span>
+            <!-- Content overlaying the canvas -->
+            <div id="content">
+                <!-- Moved header content inside the canvas -->
+                <header>
+                    <div class="container">
+                        <div class="logo">
+                            <h1>QuoteFinder</h1>
+                        </div>
+                        <div class="login-signup">
+                            <button id="loginSignupBtn"><i class="fas fa-user"></i> Login / Sign Up</button>
+                        </div>
+                    </div>
+                </header>
+                <!-- Added welcome message -->
+                <div class="welcome-message">
+                    <h2>Welcome to QuoteFinder!</h2>
+                </div>
+
+                <!-- Update the typing animation div -->
+                <div id="typing-animation" class="typing-container">
+                    <div class="prompt-section">
+                        <span class="prompt-text">Prompt: </span>
+                        <span class="quote-text">"Quotes of harry potter making his new home at Hogwarts."</span>
+                    </div>
+                    
+                    <div id="animated-text" class="typing-text"></div>
+                </div>
+
+                <!-- Auth Section -->
+                <div id="auth-section">
+                    <!-- The login button is already in the header -->
+                </div>
+
+                <!-- User Profile Section (hidden initially) -->
+                <div id="profile" style="display: none;">
+                    <h2>User Profile</h2>
+                    <p id="user-name"></p>
+                    <p id="user-email"></p>
+                    <img id="user-image" src="" alt="Profile Picture" />
+                    <a href="/logout" id="logout-button">Logout</a>
+                </div>
+
+                <!-- PDF Upload Form (also hidden initially, shown after login) -->
+                <div id="upload-section" style="display: none;">
+                    <form id="uploadForm" action="/upload-pdf" method="post" enctype="multipart/form-data">
+                        <h2>Upload a PDF File</h2>
+                        <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                        <button type="submit">Upload</button>
+                        <p id="message"></p>
+                    </form>
+                </div>
             </div>
-            
-            <div id="animated-text" class="typing-text"></div>
         </div>
-
-        <!-- Auth Section -->
-        <div id="auth-section">
-            <!-- The login button is already in the header -->
-        </div>
-
-        <!-- User Profile Section (hidden initially) -->
-        <div id="profile" style="display: none;">
-            <h2>User Profile</h2>
-            <p id="user-name"></p>
-            <p id="user-email"></p>
-            <img id="user-image" src="" alt="Profile Picture" />
-            <a href="/logout" id="logout-button">Logout</a>
-        </div>
-
-        <!-- PDF Upload Form (also hidden initially, shown after login) -->
-        <div id="upload-section" style="display: none;">
-            <form id="uploadForm" action="/upload-pdf" method="post" enctype="multipart/form-data">
-                <h2>Upload a PDF File</h2>
-                <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
-                <button type="submit">Upload</button>
-                <p id="message"></p>
-            </form>
-        </div>
-
     </main>
 
     <!-- Login/Signup Modal -->

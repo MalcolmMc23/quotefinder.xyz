@@ -439,3 +439,33 @@ button:hover, .btn:hover, #logout-button:hover {
         transform: translateX(calc(-150vw)) translateY(var(--y-movement, -50px)) rotate(-5deg);
     }
 }
+
+/* Additional styles for positioning */
+#content {
+    position: absolute; /* Position content absolutely over the canvas */
+    top: 20px; /* Adjust this value to move content down */
+    left: 0; /* Align content to the left */
+    width: 100%; /* Make content fill the width of the canvas */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to the top */
+    align-items: center; /* Center content horizontally */
+    color: white; /* Change text color for visibility */
+    z-index: 1; /* Ensure content is above the canvas */
+}
+
+/* Adjust header styles if necessary */
+header {
+    width: 100%; /* Ensure header takes full width */
+    display: flex;
+    justify-content: space-between; /* Space between logo and button */
+    align-items: center; /* Center items vertically */
+    padding: 10px; /* Add padding for spacing */
+}
+
+.welcome-message {
+    text-align: center; /* Center the welcome message */
+    color: #f1f1f1; /* Ensure the text is light */
+    margin-top: 20px; /* Add some space above the message */
+    font-size: 2.5em; /* Increased font size for the welcome message */
+}

@@ -85,37 +85,49 @@ document.addEventListener('DOMContentLoaded', function () {
     }, startDelay);
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    const floatingTexts = document.querySelectorAll('.floating-text');
-    const numTexts = floatingTexts.length;
-    const zoneHeight = 100 / numTexts; // Height of each zone in percentage
 
-    floatingTexts.forEach((text, index) => {
-        // Vertical position within its zone
-        const zoneTop = index * zoneHeight;
-        const zoneBottom = (index + 1) * zoneHeight;
-        const top = zoneTop + Math.random() * (zoneBottom - zoneTop);
-        text.style.top = `${top}%`;
+let canvas = document.getElementById('drawingCanvas')
+let canvasContext = canvas.getContext('2d');
 
-        // Random start position (left or right)
-        const startSide = Math.random() < 0.5 ? 'left' : 'right';
-        text.style[startSide] = '-50%';
-        text.style[startSide === 'left' ? 'right' : 'left'] = 'auto';
 
-        // Random animation duration
-        const duration = Math.random() * 10 + 25; // 25s to 35s
-        text.style.animationDuration = `${duration}s`;
+class FloatingText {
+    constructor(text, font) {
+        this.text = text;
+        this.x = 0
+        this.y = 0
+        this.vX = 1
+        this.vY = 1
+        // this.init();
+    }
 
-        // Random delay
-        const delay = Math.random() * -15;
-        text.style.animationDelay = `${delay}s`;
+    run() {
+        this.render()
+        this.update();
+    }
 
-        // Set animation direction
-        text.style.animationName = startSide === 'left' ? 'float' : 'float-reverse';
+    render() {
+        canvasContext.clearRect(0, 0, 10000, 10000); // Clear the canvas
+        canvasContext.font = "30px 'YourFontName', sans-serif"; // Set the font size and family
+        canvasContext.fillText("alksjflaskdjf;lasdkfjlaskdjf", this.x, this.y);
 
-        // Random slight up or down movement (reduced range)
-        const maxMovement = zoneHeight / 4; // Limit movement to 1/4 of the zone height
-        const yMovement = (Math.random() * 2 - 1) * maxMovement; // -maxMovement to +maxMovement
-        text.style.setProperty('--y-movement', `${yMovement}vh`);
-    });
-});
+    }
+    update() {
+        this.x += this.vX;
+        this.y += this.vY;
+        console.log(this.x, this.y);
+    }
+}
+
+
+
+let fText;
+window.onload = init;
+function init() {
+    fText = new FloatingText("hello")
+    animate();
+}
+
+function animate() {
+    fText.run()
+    requestAnimationFrame(animate);
+}
