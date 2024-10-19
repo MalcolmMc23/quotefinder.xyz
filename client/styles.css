@@ -33,7 +33,7 @@ header .login-signup {
 }
 
 header .login-signup button {
-    background-color: #ff9900;
+    background-color: #ff9900; /* Default background color */
     color: #fff;
     border: none;
     padding: 12px 18px; /* Slightly increased padding */
@@ -42,6 +42,8 @@ header .login-signup button {
     display: flex;
     align-items: center;
     border-radius: 4px;
+    background-image: linear-gradient(90deg, rgba(255, 153, 0, 0.7) 25%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 153, 0, 0.7) 75%);
+    background-size: 200px 100%;
 }
 
 header .login-signup button i {
@@ -49,8 +51,11 @@ header .login-signup button i {
     font-size: 20px;
 }
 
+/* Apply shimmer effect only on hover and ensure no dimming */
 header .login-signup button:hover {
-    background-color: #e68a00;
+    animation: shimmer 3s infinite linear; /* Slowed down to 3 seconds */
+    background-image: linear-gradient(90deg, rgba(255, 153, 0, 0.7) 25%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 153, 0, 0.7) 75%); /* Keep the same gradient */
+    box-shadow: none; /* Remove any shadow effect */
 }
 
 /* Main content styles */
@@ -139,14 +144,12 @@ main {
 .modal {
     display: none; /* Hidden by default */
     position: fixed;
-    z-index: 1000;
+    z-index: 1000; /* Keep this high for modal visibility */
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(30, 30, 30, 0.9); /* Dark, slightly transparent */
-
-    /* Flexbox for centering */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -160,11 +163,11 @@ main {
     width: 80%;
     max-width: 400px;
     text-align: center;
-    position: relative;
     
-    /* Add border */
+    /* Add border with pulsing effect */
     border: 3px solid #4285f4; /* Thicker blue border */
-    box-shadow: 0 0 15px rgba(66, 133, 244, 0.4); /* Blue glow */
+    box-shadow: 0 0 15px rgba(66, 133, 244, 0.6); /* Blue glow */
+    animation: pulse 2s infinite; /* Faster pulsing effect */
 }
 
 .modal-content h2 {
@@ -189,12 +192,14 @@ main {
     background-color: #db4437;
     color: #fff;
     border: none;
+    border-radius: 8px; /* Added rounded edges */
 }
 
 #emailSignIn {
     background-color: #4285f4;
     color: #fff;
     border: none;
+    border-radius: 8px; /* Added rounded edges */
 }
 
 .close-button {
@@ -361,13 +366,13 @@ button:hover, .btn:hover, #logout-button:hover {
 
 /* Floating text animation styles */
 .floating-text-container {
-    position: fixed;
+    position: fixed; /* Ensure it stays in place */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    pointer-events: none;
-    z-index: -1;
+    pointer-events: none; /* Allow clicks to pass through */
+    z-index: 0; /* Lower z-index than modal */
     overflow: hidden;
 }
 
@@ -437,5 +442,41 @@ button:hover, .btn:hover, #logout-button:hover {
     }
     100% {
         transform: translateX(calc(-150vw)) translateY(var(--y-movement, -50px)) rotate(-5deg);
+    }
+}
+
+/* Add shimmer effect for the login/signup button */
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+    100% {
+        background-position: 200px 0;
+    }
+}
+
+/* Add shimmer effect for the modal border */
+@keyframes borderShimmer {
+    0% {
+        border-color: rgba(66, 133, 244, 0.7); /* Brighter start color */
+    }
+    50% {
+        border-color: rgba(66, 133, 244, 1); /* Brightest color */
+    }
+    100% {
+        border-color: rgba(66, 133, 244, 0.7); /* Brighter end color */
+    }
+}
+
+/* Add pulsing effect for the modal border */
+@keyframes pulse {
+    0% {
+        border-color: rgba(66, 133, 244, 0.5); /* Start color (dimmer) */
+    }
+    50% {
+        border-color: rgba(66, 133, 244, 1); /* Brightest color */
+    }
+    100% {
+        border-color: rgba(66, 133, 244, 0.5); /* End color (dimmer) */
     }
 }
