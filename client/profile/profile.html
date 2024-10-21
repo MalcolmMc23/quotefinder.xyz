@@ -53,7 +53,6 @@
     </main>
 
     <!-- Include JavaScript file -->
-    <script src="app.js"></script>
 
     <!-- Add this just before the closing </body> tag -->
     <!-- Logout Confirmation Modal -->
@@ -78,32 +77,15 @@
     </div>
 
     <!-- Settings Popup -->
-    <div id="settingsPopup" class="modal" onclick="closeSettingsPopup(event)">
-        <div class="modal-content">
+    <div id="settingsPopup" class="settings-modal" onclick="closeSettingsPopup(event)">
+        <div class="settings-modal-content">
             <h2>Settings</h2>
             <p>Adjust your preferences here.</p>
             <!-- Add your settings options here -->
+           
         </div>
     </div>
+    <script src="app.js"></script>
 
-    <script>
-        function closeProfilePopup(event) {
-            const popup = document.getElementById('profilePopup');
-            if (event.target === popup) {
-                popup.style.display = 'none';
-            }
-        }
-
-        function openSettingsPopup() {
-            document.getElementById('settingsPopup').style.display = 'block';
-        }
-
-        function closeSettingsPopup(event) {
-            const popup = document.getElementById('settingsPopup');
-            if (event.target === popup) {
-                popup.style.display = 'none';
-            }
-        }
-    </script>
 </body>
 </html>

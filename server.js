@@ -16,7 +16,6 @@ const port = 3000;
 // PostgreSQL connection setup
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    // connectionString: "postgres://postgres:tuxHwpjgC6tuul9Q1sfZwQxnB647nLRtw72LrUIHPVJXj8pTif8jFC3LP77D7wuL@5.78.79.99:9000/postgres"
 })
 
 

@@ -53,7 +53,7 @@ document.getElementById('burger-button').onclick = function () {
 // Show the logout confirmation modal
 function showLogoutModal() {
     const modal = document.getElementById('logoutModal');
-    modal.style.display = 'flex';
+    modal.style.display = 'flex'; // This line shows the modal
 }
 
 // Hide the logout confirmation modal
@@ -73,12 +73,14 @@ function handleLogout() {
 // Add event listeners when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('logoutModal');
+    modal.style.display = 'none'; // Ensure the modal is hidden on load
+
     const logoutLink = document.querySelector('.sidebar a[href="/logout"]');
 
     // Add click event listener to the logout link
     logoutLink.addEventListener('click', function (e) {
         e.preventDefault(); // Prevent the default link behavior
-        showLogoutModal();
+        showLogoutModal(); // This should only be called on logout link click
     });
 
     // Add click event listener to the confirm logout button
@@ -93,6 +95,12 @@ document.addEventListener('DOMContentLoaded', function () {
             hideLogoutModal();
         }
     });
+
+    // Your code here
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', openLogoutModal);
+    }
 });
 
 // Show the profile popup with user information
@@ -114,4 +122,61 @@ function showProfilePopup() {
 document.querySelector('.sidebar a[href="#"]').addEventListener('click', function (e) {
     e.preventDefault(); // Prevent the default link behavior
     showProfilePopup();
+});
+
+function openLogoutModal() {
+    document.getElementById('logoutModal').style.display = 'flex'; // Show the modal
+}
+
+// Example of how to call this function
+document.getElementById('logoutButton').addEventListener('click', openLogoutModal);
+
+
+
+
+function closeProfilePopup(event) {
+    const popup = document.getElementById('profilePopup');
+    if (event.target === popup) {
+        popup.style.display = 'none';
+    }
+}
+
+// Remove the following functions related to settings popup
+// function openSettingsPopup() {
+//     document.getElementById('settingsPopup').style.display = 'block';
+// }
+
+// function closeSettingsPopup(event) {
+//     const popup = document.getElementById('settingsPopup');
+//     if (event.target === popup) {
+//         popup.style.display = 'none';
+//     }
+// }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', openLogoutModal);
+    } else {
+        console.error('Logout button not found in the DOM.');
+    }
+});
+
+// Show the settings popup
+function openSettingsPopup() {
+    document.getElementById('settingsPopup').style.display = 'flex'; // Show the settings modal
+}
+
+// Hide the settings popup
+function closeSettingsPopup(event) {
+    const popup = document.getElementById('settingsPopup');
+    if (event.target === popup) {
+        popup.style.display = 'none'; // Hide the settings modal
+    }
+}
+
+// Add event listener to the settings link
+document.querySelector('.sidebar a[href="#"]').addEventListener('click', function (e) {
+    e.preventDefault(); // Prevent the default link behavior
+    openSettingsPopup(); // Show the settings modal
 });
