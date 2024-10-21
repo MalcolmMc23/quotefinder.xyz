@@ -48,7 +48,36 @@ document.getElementById('emailSignIn').onclick = function () {
 
 // Handle email login form submission
 document.getElementById('submitEmailLogin').onclick = async function () {
-    // ... (Existing code for handling email login submission)
+    const email = document.getElementById('emailInput').value;
+    const password = document.getElementById('passwordInput').value;
+
+    // Basic validation
+    if (!email || !password) {
+        console.log('Email and password are required.');
+        return;
+    }
+
+    try {
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json(); // Get the error message from the response
+            throw new Error(errorData.error || 'Network response was not ok');
+        }
+
+        const data = await response.json();
+        // Handle successful login
+        window.location.href = '/profile';
+    } catch (error) {
+        console.error('Error during login:', error);
+        document.getElementById('emailLoginMessage').innerText = error.message; // Display the error message
+    }
 };
 
 // Handle upload form submission

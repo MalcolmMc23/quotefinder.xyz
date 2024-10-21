@@ -7,7 +7,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 require('dotenv').config()
-
+const bcrypt = require('bcrypt')
 
 // Initialize the Express app
 const app = express();
@@ -18,6 +18,8 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
 })
 
+// Add this line to use the built-in JSON parser
+app.use(express.json()); // This will parse JSON bodies
 
 // Middleware for sessions
 app.use(session({
@@ -41,8 +43,8 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL,
-    // callbackURL: "http://localhost:3000/auth/google/callback"
+    // callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    callbackURL: "http://localhost:3000/auth/google/callback"
 
 }, async (accessToken, refreshToken, profile, done) => {
     console.log('Google profile:', profile);  // Add this to see the profile returned
@@ -112,6 +114,47 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
 app.get('/error', (req, res) => {
     res.status(500).send('Authentication failed. Please try again.');
 });
+
+
+// Login route (without google)
+
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    // Basic validation
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required.' });
+    }
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
+        const user = result.rows[0];
+
+        // Check if the user exists and is associated with a Google account
+        if (user) {
+            if (user.google_id) {
+                // User has logged in with Google, prevent email/password login
+                return res.status(403).json({ error: 'This email is associated with a Google account. Please log in using Google.' });
+            }
+
+            // If the user exists and is not associated with Google, verify the password
+            if (await bcrypt.compare(password, user.password)) {
+                req.session.userId = user.id; // Create a session
+                return res.status(200).json({ message: 'Login successful' });
+            }
+        }
+
+        // If user does not exist or password is incorrect
+        res.status(401).json({ error: 'Invalid email or password' });
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
 
 // Logout route
 app.get('/logout', (req, res, next) => {
@@ -245,3 +288,6 @@ app.listen(port, () => {
 async function generateResponse() {
     return "Hello"
 }
+
+
+
