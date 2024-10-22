@@ -17,6 +17,9 @@ window.onload = async function () {
         document.getElementById('user-email').textContent = user.email;
         document.getElementById('google-id').textContent = user.google_id;
         document.getElementById('created-at').textContent = new Date(user.created_at).toLocaleString();
+
+        const hasAccessText = user.has_access
+        document.getElementById('access-status').textContent = hasAccessText;
     } catch (error) {
         console.error('Error fetching user profile:', error);
         // Optionally, redirect to login page or show an error message
@@ -130,7 +133,7 @@ function openLogoutModal() {
 }
 
 // Example of how to call this function
-document.getElementById('logoutButton').addEventListener('click', openLogoutModal);
+// document.getElementById('logoutButton').addEventListener('click', openLogoutModal);
 
 
 

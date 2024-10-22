@@ -310,6 +310,33 @@ app.listen(port, () => {
 
 
 
+// grantUserAccess(1);
+
+// Function to update user's "has_access" to true
+async function grantUserAccess(userId) {
+    let client;
+    try {
+        client = await pool.connect();
+        const result = await client.query(
+            'UPDATE users SET has_access = $1 WHERE id = $2 RETURNING *',
+            [true, userId]
+        );
+
+        if (result.rowCount === 0) {
+            console.log(`User with ID ${userId} not found`);
+            return { error: 'User not found' };
+        }
+
+        return result.rows[0]; // Return updated user data
+    } catch (error) {
+        console.error('Error updating user access:', error);
+        return { error: 'Internal server error' };
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+}
 
 
 
