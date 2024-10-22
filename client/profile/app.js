@@ -2,6 +2,7 @@
 window.onload = async function () {
     try {
         const response = await fetch('/api/profile');
+        console.log('Response status:', response.status); // Log the response status
         if (!response.ok) {
             // Handle non-200 responses (like redirects)
             throw new Error('Failed to fetch profile data. Please log in again.');
@@ -24,12 +25,12 @@ window.onload = async function () {
 };
 
 // Handle the submit button in the input section
-document.getElementById('submitButton').onclick = function () {
-    const userInput = document.getElementById('userInput').value;
-    // Do something with the user input, e.g., send it to the server
-    console.log('User input:', userInput);
-    // You can implement your own functionality here
-};
+// document.getElementById('submitButton').onclick = function () {
+//     const userInput = document.getElementById('userInput').value;
+//     // Do something with the user input, e.g., send it to the server
+//     console.log('User input:', userInput);
+//     // You can implement your own functionality here
+// };
 
 // Open the sidebar
 function openNav() {
@@ -141,18 +142,6 @@ function closeProfilePopup(event) {
     }
 }
 
-// Remove the following functions related to settings popup
-// function openSettingsPopup() {
-//     document.getElementById('settingsPopup').style.display = 'block';
-// }
-
-// function closeSettingsPopup(event) {
-//     const popup = document.getElementById('settingsPopup');
-//     if (event.target === popup) {
-//         popup.style.display = 'none';
-//     }
-// }
-
 document.addEventListener('DOMContentLoaded', function () {
     const logoutButton = document.getElementById('logoutButton');
     if (logoutButton) {
@@ -180,3 +169,4 @@ document.querySelector('.sidebar a[href="#"]').addEventListener('click', functio
     e.preventDefault(); // Prevent the default link behavior
     openSettingsPopup(); // Show the settings modal
 });
+

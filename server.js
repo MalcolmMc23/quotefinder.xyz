@@ -9,6 +9,18 @@ const session = require('express-session');
 require('dotenv').config()
 const bcrypt = require('bcrypt')
 
+
+
+// Function to normalize email addresses (specifically for Gmail)
+function normalizeEmail(email) {
+    const [localPart, domain] = email.split('@');
+    if (domain.toLowerCase() === 'gmail.com' || domain.toLowerCase() === 'googlemail.com') {
+        return (localPart.replace(/\./g, '') + '@' + domain).toLowerCase();
+    }
+    return email.toLowerCase(); // Return the original email in lowercase if not Gmail
+}
+
+
 // Initialize the Express app
 const app = express();
 const port = 3000;
@@ -23,57 +35,52 @@ app.use(express.json()); // This will parse JSON bodies
 
 // Middleware for sessions
 app.use(session({
-    secret: process.env.SESSION_SECRET, // Make sure this is a secure, long secret
+    secret: process.env.SESSION_SECRET, // Use a secure secret
     resave: false,
     saveUninitialized: false,
-    rolling: true,  // Reset cookie expiration on each request
-
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
         httpOnly: true,
         sameSite: 'lax' // Adjust based on your setup
     }
 }));
 
-
-// Initialize Passport and restore authentication state, if any, from the session
+// Initialize Passport after session middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // callbackURL: process.env.GOOGLE_CALLBACK_URL,
-    callbackURL: "http://localhost:3000/auth/google/callback"
-
-}, async (accessToken, refreshToken, profile, done) => {
-    console.log('Google profile:', profile);  // Add this to see the profile returned
-    let client;  // Declare client here to ensure it's in scope
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    // callbackURL: "http://localhost:3000/auth/google/callback"
+}, async (req, accessToken, refreshToken, profile, done) => {
+    let client;
     try {
-        client = await pool.connect();  // Connect to the database
+        client = await pool.connect();
 
         // Check if the user already exists in the database
-        const result = await client.query(
-            'SELECT * FROM users WHERE google_id = $1',
-            [profile.id]
-        );
+        const result = await client.query('SELECT * FROM users WHERE google_id = $1', [profile.id]);
         let user = result.rows[0];
 
         if (!user) {
-            // If user does not exist, insert a new user with a timestamp
+            // If user does not exist, insert a new user
             const insertResult = await client.query(
                 'INSERT INTO users (google_id, name, email) VALUES ($1, $2, $3) RETURNING *',
-                [profile.id, profile.displayName, profile.emails[0].value]
+                [profile.id, profile.displayName, normalizeEmail(profile.emails[0].value)]
             );
-            user = insertResult.rows[0];  // This will include the created_at timestamp
+            user = insertResult.rows[0]; // Newly created user
         }
 
-        return done(null, user);  // Pass the user object to Passport
+        // Set the session user ID
+        // req.session.userId = user.id; // This should work if req.session is defined'
+        // console.log(req.session.userId)
+        return done(null, user); // Pass the user object to Passport
     } catch (error) {
-        console.error('Error during Google OAuth strategy:', error);  // Log the error
-        return done(error);  // Pass the error back to Passport
+        console.error('Error during Google OAuth strategy:', error);
+        return done(error);
     } finally {
-        if (client) {  // Ensure client is defined before calling release
+        if (client) {
             client.release();
         }
     }
@@ -105,10 +112,9 @@ app.get('/auth/google', (req, res, next) => {
 }, passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-    console.log('Session:', req.session);  // Check the session details
-    req.session.save(() => {
-        res.redirect('/profile');  // Redirect after login
-    });
+    // Successful authentication, set the session user ID
+    req.session.userId = req.user.id; // Set the session user ID
+    res.redirect('/profile'); // Redirect to the profile page
 });
 
 app.get('/error', (req, res) => {
@@ -116,9 +122,8 @@ app.get('/error', (req, res) => {
 });
 
 
-// Login route (without google)
 
-app.post('/login', async (req, res) => {
+app.post('/signin', async (req, res) => {
     const { email, password } = req.body;
 
     // Basic validation
@@ -126,30 +131,55 @@ app.post('/login', async (req, res) => {
         return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    try {
-        const client = await pool.connect();
-        const result = await client.query('SELECT * FROM users WHERE email = $1', [email]);
-        const user = result.rows[0];
+    // Normalize the email before using it in queries
+    const normalizedEmail = normalizeEmail(email);
 
-        // Check if the user exists and is associated with a Google account
+    let client; // Declare client here for scope
+    try {
+        client = await pool.connect();
+
+        // Query for user using normalized email
+        const result = await client.query('SELECT * FROM users WHERE email = $1', [normalizedEmail]);
+        let user = result.rows[0];
+
         if (user) {
+            // Check if the user is associated with a Google account
             if (user.google_id) {
-                // User has logged in with Google, prevent email/password login
                 return res.status(403).json({ error: 'This email is associated with a Google account. Please log in using Google.' });
             }
 
-            // If the user exists and is not associated with Google, verify the password
-            if (await bcrypt.compare(password, user.password)) {
-                req.session.userId = user.id; // Create a session
-                return res.status(200).json({ message: 'Login successful' });
+            // Ensure the password field exists in the user object
+            if (user.password_hash) {
+                // If the user exists and is not associated with Google, verify the password
+                const isMatch = await bcrypt.compare(password, user.password_hash);
+                if (isMatch) {
+                    req.session.userId = user.id; // Create a session
+                    return res.status(200).json({ message: 'Login successful' });
+                } else {
+                    return res.status(401).json({ error: 'Invalid email or password.' });
+                }
+            } else {
+                return res.status(401).json({ error: 'Password not found for this user.' });
             }
+        } else {
+            // If user does not exist, create a new user with a hashed password
+            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+            const insertResult = await client.query(
+                'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING *',
+                [normalizedEmail, hashedPassword]
+            );
+            user = insertResult.rows[0]; // Newly created user
+            req.session.userId = user.id; // Create a session
+            return res.status(201).json({ message: 'User created and logged in successfully' });
         }
 
-        // If user does not exist or password is incorrect
-        res.status(401).json({ error: 'Invalid email or password' });
     } catch (error) {
-        console.error('Error during login:', error);
+        console.error('Error during login:', error); // Log the error
         res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        if (client) {
+            client.release(); // Ensure the client is released
+        }
     }
 });
 
@@ -178,26 +208,63 @@ app.get('/logout', (req, res, next) => {
 
 
 function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() || req.session.userId) { // Check if user is authenticated or has a session
         return next();
     }
-    res.redirect('/auth/google');
+    res.redirect('/'); // Redirect to home if not authenticated
 }
 
-app.get('/profile', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'client', 'profile/profile.html'));
+app.get('/profile', isAuthenticated, async (req, res) => {
+    // Check if user data is available in the session
+    console.log(req.user)
+    if (!req.user) {
+        // If req.user is not available, fetch user data from the database using req.session.userId
+        const userId = req.session.userId;
+        if (userId) {
+            const client = await pool.connect(); // Get a client from the pool
+            try {
+                const result = await client.query('SELECT * FROM users WHERE id = $1', [userId]);
+                const user = result.rows[0];
+                if (user) {
+                    // Render the profile page with user data
+                    res.sendFile(path.join(__dirname, 'client', 'profile/profile.html'));
+                } else {
+                    res.redirect('/'); // Redirect if user not found
+                }
+            } catch (err) {
+                console.error('Error fetching user data:', err);
+                res.status(500).send('Internal Server Error');
+            } finally {
+                client.release(); // Ensure the client is released in the finally block
+            }
+        } else {
+            console.log("no user id");
+            res.redirect('/'); // Redirect if no user ID in session
+        }
+    } else {
+        // If req.user is available, render the profile page
+        res.sendFile(path.join(__dirname, 'client', 'profile/profile.html'));
+    }
 });
 
 // Serve user data as JSON for the client-side JavaScript to fetch
-app.get('/api/profile', isAuthenticated, (req, res) => {
-    const user = {
-        google_id: req.user.google_id,
-        name: req.user.name,
-        email: req.user.email,
-        profile_picture: req.user.profile_picture || req.user.photos?.[0]?.value,
-        created_at: req.user.created_at
-    };
-    res.json({ user });
+app.get('/api/profile', isAuthenticated, async (req, res) => {
+    const userId = req.session.userId; // Get user ID from session
+    const client = await pool.connect();
+    try {
+        const result = await client.query('SELECT * FROM users WHERE id = $1', [userId]);
+        const user = result.rows[0];
+        if (user) {
+            res.json({ user });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    } finally {
+        client.release();
+    }
 });
 
 // Set up storage for uploaded files using Multer
@@ -235,49 +302,6 @@ app.post('/upload-pdf', upload.single('pdfFile'), (req, res) => {
     }
 });
 
-app.get('/generate-response', async (req, res) => {
-    const haiku = await generateResponse();
-    res.send(haiku);
-});
-
-
-//! testing zone
-
-
-// Function to add a random number to the database
-async function addRandomNumber() {
-    const randomNumber = Math.floor(Math.random() * 100);  // Generate a random number
-    try {
-        const client = await pool.connect();  // Get a client from the connection pool
-        const result = await client.query(
-            'INSERT INTO random_numbers (number) VALUES ($1) RETURNING *',
-            [randomNumber]
-        );
-        client.release();  // Release the client back to the pool
-        return result.rows[0];  // Return the inserted row
-    } catch (error) {  // Catch and log the error (change err to error)
-        console.error('Error adding random number to database:', error);
-        throw error;  // Re-throw the error to propagate it to the caller
-    }
-}
-
-// New route to add a random number to the database
-app.get('/add-random-number', async (req, res) => {
-    try {
-        const result = await addRandomNumber();
-        res.json({ message: 'Random number added successfully', number: result.number });
-    } catch (error) {
-        console.error('Error adding random number:', error);  // Log the actual error
-        res.status(500).json({ error: 'Failed to add random number' });
-    }
-});
-
-
-
-
-
-//! end of testing zone
-
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
@@ -285,9 +309,7 @@ app.listen(port, () => {
 
 
 
-async function generateResponse() {
-    return "Hello"
-}
+
 
 
 

@@ -58,7 +58,7 @@ document.getElementById('submitEmailLogin').onclick = async function () {
     }
 
     try {
-        const response = await fetch('/login', {
+        const response = await fetch('/signin', { // Updated endpoint to /signin
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ document.getElementById('submitEmailLogin').onclick = async function () {
         }
 
         const data = await response.json();
-        // Handle successful login
+        // Handle successful login or signup
         window.location.href = '/profile';
     } catch (error) {
         console.error('Error during login:', error);
