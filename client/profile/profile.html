@@ -8,16 +8,14 @@
     <link rel="stylesheet" href="styles.css">
     <!-- Include Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-
 </head>
 <body>
-    
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="#"><i class="fas fa-user"></i> Profile</a>
-        <a href="#" onclick="openSettingsPopup()"><i class="fas fa-cog"></i> Settings</a>
-        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="#" id="profileLink"><i class="fas fa-user"></i> Profile</a>
+        <a href="#" id="settingsLink"><i class="fas fa-cog"></i> Settings</a>
+        <a href="/logout" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
 
     <!-- Header section -->
@@ -27,7 +25,7 @@
                 <h1>QuoteFinder</h1>
             </div>
             <div class="burger-menu">
-                <button id="burger-button" onclick="openNav()"><i class="fas fa-bars"></i> Menu</button>
+                <button id="burger-button"><i class="fas fa-bars"></i> Menu</button>
             </div>
         </div>
     </header>
@@ -55,9 +53,6 @@
         </div>
     </main>
 
-    <!-- Include JavaScript file -->
-
-    <!-- Add this just before the closing </body> tag -->
     <!-- Logout Confirmation Modal -->
     <div id="logoutModal" class="modal">
         <div class="modal-content">
@@ -71,7 +66,7 @@
     </div>
 
     <!-- Profile Popup -->
-    <div id="profilePopup" class="modal" onclick="closeProfilePopup(event)">
+    <div id="profilePopup" class="modal">
         <div class="modal-content">
             <h2></h2> <!-- User's name will be set here -->
             <p></p> <!-- User's info will be set here -->
@@ -80,15 +75,16 @@
     </div>
 
     <!-- Settings Popup -->
-    <div id="settingsPopup" class="settings-modal" onclick="closeSettingsPopup(event)">
-        <div class="settings-modal-content">
+    <div id="settingsPopup" class="modal">
+        <div class="modal-content">
             <h2>Settings</h2>
             <p>Adjust your preferences here.</p>
             <!-- Add your settings options here -->
-           
+            <button onclick="document.getElementById('settingsPopup').style.display='none'">Close</button>
         </div>
     </div>
-    <script src="app.js"></script>
 
+    <!-- Include JavaScript file -->
+    <script src="app.js"></script>
 </body>
 </html>

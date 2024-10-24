@@ -26,11 +26,18 @@ header .logo h1 {
     padding-top: 10px; /* Added padding to lower the title */
 }
 
-header .logout button {
-    background-color: #ff3333;
+/* Burger menu styles */
+.burger-menu {
+    display: flex;
+    align-items: center;
+    padding-top: 10px; /* Added padding to lower the button */
+}
+
+.burger-menu button {
+    background-color: #ff9900;
     color: #fff;
     border: none;
-    padding: 12px 18px;
+    padding: 12px 18px; /* Slightly increased padding */
     cursor: pointer;
     font-size: 18px;
     display: flex;
@@ -38,19 +45,21 @@ header .logout button {
     border-radius: 4px;
 }
 
-header .logout button i {
+.burger-menu button i {
     margin-right: 8px;
     font-size: 20px;
 }
 
-header .logout button:hover {
-    background-color: #cc0000;
+.burger-menu button:hover {
+    background-color: #e68a00;
 }
 
 /* Main content styles */
 main {
     margin-top: 50px;
     text-align: center;
+    transition: margin-right 0.5s; /* Adjust main content when sidebar is open */
+    padding: 16px;
 }
 
 .page-title h2 {
@@ -117,35 +126,6 @@ main {
     background-color: #e68a00;
 }
 
-/* Responsive */
-@media screen and (max-width: 600px) {
-    header .container {
-        flex-direction: column;
-    }
-
-    .input-section input[type="text"] {
-        width: 80%;
-    }
-}
-
-/* Ensure all text is light */
-h1, h2, h3, h4, h5, h6, p, label, a {
-    color: #f1f1f1;
-}
-
-/* Input focus styles */
-input:focus, button:focus {
-    outline: 2px solid #4285f4;
-    outline-offset: 2px;
-}
-
-/* Burger menu styles */
-.burger-menu {
-    display: flex;
-    align-items: center;
-    padding-top: 10px; /* Added padding to lower the button */
-}
-
 /* Sidebar styles */
 .sidebar {
     height: 100%;
@@ -178,39 +158,30 @@ input:focus, button:focus {
     top: 0;
     right: 25px;
     font-size: 36px;
-    margin-left: 50px;
 }
 
 .sidebar i {
     margin-right: 10px;
 }
 
-/* Adjust main content when sidebar is open */
-#main {
-    transition: margin-right .5s;
-    padding: 16px;
+/* Input focus styles */
+input:focus,
+button:focus {
+    outline: 2px solid #4285f4;
+    outline-offset: 2px;
 }
 
-/* Burger menu styles */
-.burger-menu button {
-    background-color: #ff9900;
-    color: #fff;
-    border: none;
-    padding: 12px 18px; /* Slightly increased padding */
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    border-radius: 4px;
-}
-
-.burger-menu button i {
-    margin-right: 8px;
-    font-size: 20px;
-}
-
-.burger-menu button:hover {
-    background-color: #e68a00;
+/* Ensure all text is light */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label,
+a {
+    color: #f1f1f1;
 }
 
 /* Modal styles */
@@ -223,7 +194,7 @@ input:focus, button:focus {
     width: 100%;
     height: 100%;
     background-color: rgba(30, 30, 30, 0.9);
-    display: flex; /* Ensure flex display is set */
+    display: flex; /* Enable flexbox */
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
 }
@@ -239,12 +210,15 @@ input:focus, button:focus {
     position: relative;
     border: 3px solid #4285f4;
     box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);
+    /* Removed conflicting styles */
 }
 
+/* Modal content heading */
 .modal-content h2 {
     margin-top: 0;
 }
 
+/* Modal buttons */
 .modal-buttons {
     display: flex;
     justify-content: center;
@@ -274,65 +248,13 @@ input:focus, button:focus {
     opacity: 0.8;
 }
 
-/* Profile Popup styles */
-#profilePopup {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(30, 30, 30, 0.9);
-    justify-content: center;
-    align-items: center;
-}
+/* Responsive styles */
+@media screen and (max-width: 600px) {
+    header .container {
+        flex-direction: column;
+    }
 
-.modal-content {
-    background-color: #1e1e1e;
-    color: #f1f1f1;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 400px;
-    text-align: center;
-    position: relative;
-    border: 3px solid #4285f4;
-    box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);
-}
-
-/* Settings Modal styles */
-.settings-modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(30, 30, 30, 0.9); /* Darker background */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-}
-
-.settings-modal-content {
-    background-color: #1e1e1e; /* Same as body */
-    color: #f1f1f1; /* Light text */
-    padding: 20px; /* Increased padding */
-    border-radius: 8px; /* More rounded corners */
-    width: 80%;
-    max-width: 400px; /* Wider modal */
-    text-align: center;
-    position: relative;
-    border: 3px solid #4285f4; /* Different border color */
-    box-shadow: 0 0 15px rgba(66, 133, 244, 0.4); /* Different shadow */
-}
-
-.settings-options {
-    margin: 20px 0; /* Space between options */
-}
-
-.settings-options label {
-    display: block; /* Stack options vertically */
-    margin: 10px 0; /* Space between options */
+    .input-section input[type="text"] {
+        width: 80%;
+    }
 }
