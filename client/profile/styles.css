@@ -86,6 +86,7 @@ main {
     margin: 40px auto;
 }
 
+/* Style the text input */
 .input-section input[type="text"] {
     width: 300px;
     padding: 10px;
@@ -95,17 +96,24 @@ main {
     border: 1px solid #555;
 }
 
-.input-section button {
+/* Style the file input */
+.input-section input[type="file"] {
+    margin-top: 20px;
+}
+
+/* Customize the file upload button */
+.input-section input[type="file"]::file-selector-button {
     padding: 12px 18px;
     font-size: 18px;
-    background-color: #ff9900;
+    background-color: #ff9900; /* Match the previous button color */
     color: #fff;
     border: none;
     cursor: pointer;
     border-radius: 4px;
 }
 
-.input-section button:hover {
+/* Hover effect for the file upload button */
+.input-section input[type="file"]::file-selector-button:hover {
     background-color: #e68a00;
 }
 
@@ -204,8 +212,6 @@ input:focus, button:focus {
 .burger-menu button:hover {
     background-color: #e68a00;
 }
-
-/* Add these styles to your existing CSS file */
 
 /* Modal styles */
 .modal {
