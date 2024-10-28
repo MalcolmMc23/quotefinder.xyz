@@ -52,8 +52,8 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // callbackURL: process.env.GOOGLE_CALLBACK_URL,
-    callbackURL: "http://localhost:3000/auth/google/callback"
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
+    // callbackURL: "http://localhost:3000/auth/google/callback"
 }, async (req, accessToken, refreshToken, profile, done) => {
     let client;
     try {
@@ -302,11 +302,39 @@ app.post('/upload-pdf', upload.single('pdfFile'), (req, res) => {
     }
 });
 
+
+
+
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* DONT DELETE
+this is for granting access to the api service
 
 
 
@@ -339,4 +367,4 @@ async function grantUserAccess(userId) {
 }
 
 
-
+*/

@@ -150,4 +150,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Close the settings popup when clicking outside
     settingsPopup.addEventListener('click', closeSettingsPopup);
+
+
+
+    const submitButton = document.getElementById('submitButton');
+    submitButton.addEventListener('click', function () {
+        const userInput = document.getElementById('userInput').value.trim();
+        if (userInput === '') {
+            alert('Please enter some text.');
+        } else {
+            // Handle the submit action here
+            console.log('User input:', userInput);
+            // Additional functionality
+        }
+    });
 });

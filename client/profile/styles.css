@@ -2,7 +2,7 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #111827; /* Updated dark background */
+    background-color: #111827; /* Dark background */
     color: #f1f1f1; /* Light text */
 }
 
@@ -92,6 +92,10 @@ main {
 
 /* Input section styles */
 .input-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
     margin: 40px auto;
 }
 
@@ -105,8 +109,25 @@ main {
     border: 1px solid #555;
 }
 
+/* Style for the submit button */
+.input-section #submitButton {
+    margin-top: 20px;
+    padding: 12px 18px;
+    font-size: 18px;
+    background-color: #4285f4; /* Blue color */
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.input-section #submitButton:hover {
+    background-color: #3071e8;
+}
+
 /* Style the file input */
-.input-section input[type="file"] {
+.input-section #fileUpload {
     margin-top: 20px;
 }
 
@@ -210,10 +231,8 @@ a {
     position: relative;
     border: 3px solid #4285f4;
     box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);
-    /* Removed conflicting styles */
 }
 
-/* Modal content heading */
 .modal-content h2 {
     margin-top: 0;
 }
