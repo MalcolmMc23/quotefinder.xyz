@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Sending quote data:', quoteData);  // Log the data to verify
 
             // API call to submit the quote
-            fetch('api/quotes', {
+            fetch('https://banana.quotefinder.xyz/api/quotes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
