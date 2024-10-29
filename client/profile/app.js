@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Premade quote and book to submit
             const quoteData = {
                 book: 'Book name',
-                quote_text: userInput.value
+                quote_text: userInput
             };
 
             console.log('Sending quote data:', quoteData);  // Log the data to verify
