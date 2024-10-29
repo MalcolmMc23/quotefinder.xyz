@@ -267,6 +267,43 @@ app.get('/api/profile', isAuthenticated, async (req, res) => {
     }
 });
 
+
+
+// Route for adding a new quote with authentication
+app.post('/api/quotes', isAuthenticated, async (req, res) => {
+    const { book, quote_text } = req.body;
+    const user_id = req.session.userId; // Get user ID from the session
+
+    // Check if all required fields are provided
+    if (!user_id || !book || !quote_text) {
+        return res.status(400).json({ error: 'User must be logged in, and book and quote_text are required.' });
+    }
+
+    let client;
+    try {
+        // Connect to the database
+        client = await pool.connect();
+
+        // Insert the new quote into the quotes table
+        const result = await client.query(
+            'INSERT INTO quotes (user_id, book, quote_text, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
+            [user_id, book, quote_text]
+        );
+
+        // Send back the newly created quote
+        res.status(201).json({ message: 'Quote added successfully', quote: result.rows[0] });
+    } catch (error) {
+        console.error('Error adding quote:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        // Release the client
+        if (client) {
+            client.release();
+        }
+    }
+});
+
+
 // Set up storage for uploaded files using Multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

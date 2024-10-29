@@ -156,12 +156,42 @@ document.addEventListener('DOMContentLoaded', function () {
     const submitButton = document.getElementById('submitButton');
     submitButton.addEventListener('click', function () {
         const userInput = document.getElementById('userInput').value.trim();
+
         if (userInput === '') {
             alert('Please enter some text.');
         } else {
-            // Handle the submit action here
-            console.log('User input:', userInput);
-            // Additional functionality
+            // Premade quote and book to submit
+            const quoteData = {
+                book: 'Book name',
+                quote_text: userInput.value
+            };
+
+            console.log('Sending quote data:', quoteData);  // Log the data to verify
+
+            // API call to submit the quote
+            fetch('api/quotes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(quoteData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(`Error: ${err.error || 'Failed to submit quote.'}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Quote added successfully:', data);
+                    alert('Quote added successfully!');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('There was an error submitting the quote.');
+                });
         }
     });
 });
