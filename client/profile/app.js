@@ -152,6 +152,11 @@ document.addEventListener('DOMContentLoaded', function () {
     settingsPopup.addEventListener('click', closeSettingsPopup);
 
 
+    const findQuoteButton = document.getElementById('findQuoteButton');
+    findQuoteButton.addEventListener('click', function () {
+        console.log('clicked')
+    });
+
 
     const submitButton = document.getElementById('submitButton');
     submitButton.addEventListener('click', function () {
@@ -170,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // API call to submit the quote
             fetch('https://banana.quotefinder.xyz/api/quotes', {
+                // fetch('http://localhost:3000/api/addQuote', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

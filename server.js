@@ -11,6 +11,7 @@ const bcrypt = require('bcrypt')
 
 
 
+
 // Function to normalize email addresses (specifically for Gmail)
 function normalizeEmail(email) {
     const [localPart, domain] = email.split('@');
@@ -267,10 +268,17 @@ app.get('/api/profile', isAuthenticated, async (req, res) => {
     }
 });
 
+app.post('/api/findQuote', isAuthenticated, async (req, res) => {
+
+    console.log("hello world")
+
+
+})
+
 
 
 // Route for adding a new quote with authentication
-app.post('/api/quotes', isAuthenticated, async (req, res) => {
+app.post('/api/addQuote', isAuthenticated, async (req, res) => {
     const { book, quote_text } = req.body;
     const user_id = req.session.userId; // Get user ID from the session
 
