@@ -317,4 +317,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Please select a file and enter a book name before saving.');
             }
         } catch (error) {
-            console.error('Err
+            console.error('Error saving file:', error);
+            alert(error.message || 'An error occurred while saving the file.');
+            // showMessage(error.message || 'An error occurred while saving the file.', 'error');
+        }
+    });
+
+});
+//************* end of PDF file handling ************************
+
+
+
+//**************** Book List *******************
+
+
+
+
+async function fetchBooks() {
+    try {
+        const response = await fetch('/api/books');
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        displayBooks(data.books);
+    } catch (error) {
+        console.error('Error fetching books:', error);
+        const booksContainer = document.getElementById('books-container');
+        booksContainer.innerHTML = `<p style="color:red;">Failed to load your books. Please try again later.</p>`;
+    }
+}
+
+function displayBooks(books) {
+    const booksContainer = document.getElementById('books-container');
+    booksContainer.innerHTML = ''; // Clear any existing content
+
+    if (books.length === 0) {
+        booksContainer.innerHTML = '<p>You have not uploaded any books yet.</p>';
+        return;
+    }
+
+    books.forEach(book => {
+        const bookDiv = document.createElement('div');
+        bookDiv.classList.add('book-item');
+
+        const bookName = document.createElement('div');
+        bookName.classList.add('book-name');
+        bookName.textContent = book.name;
+
+        const uploadDate = document.createElement('div');
+        uploadDate.classList.add('upload-date');
+        const date = new Date(book.upload_date);
+        uploadDate.textContent = `Uploaded on: ${date.toLocaleString()}`;
+
+        const downloadLink = document.createElement('a');
+        downloadLink.href = `/download-book/${book.id}`;
+        downloadLink.classList.add('download-button');
+        downloadLink.textContent = 'Download PDF';
+
+        bookDiv.appendChild(bookName);
+        bookDiv.appendChild(uploadDate);
+        bookDiv.appendChild(downloadLink);
+
+        booksContainer.appendChild(bookDiv);
+    });
+}
+
+//***************** end of book list ***************
+

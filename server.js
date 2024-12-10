@@ -423,4 +423,168 @@ app.post('/upload-pdf', isAuthenticated, hasAccess, (req, res) => {
 
             // Read the renamed file
             fs.readFile(newFilePath, async (readErr, data) => {
-   
+                if (readErr) {
+                    console.error('Error reading file:', readErr);
+                    return res.status(500).json({ message: 'Error reading file.' });
+                }
+
+                // Retrieve userId from session
+                const userId = req.session.userId;
+                if (!userId) {
+                    return res.status(401).json({ message: 'Unauthorized: Please log in.' });
+                }
+
+                try {
+                    // Call sendToDB with the file data and userId
+                    await sendToDB({
+                        fileName: bookName,
+                        fileBuffer: data
+                    }, userId);
+
+                    res.status(201).json({ message: 'PDF uploaded and book saved successfully!' });
+                } catch (dbError) {
+                    res.status(500).json({ message: 'Error saving book to database.' });
+                }
+            });
+        });
+    });
+});
+
+
+app.get('/api/books', isAuthenticated, async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized: Please log in.' });
+    }
+
+    let client;
+    try {
+        client = await pool.connect();
+
+        const result = await client.query(
+            'SELECT id, name, upload_date FROM books WHERE user_id = $1 ORDER BY upload_date DESC',
+            [userId]
+        );
+
+        res.status(200).json({ books: result.rows });
+    } catch (error) {
+        console.error('Error fetching books:', error);
+        res.status(500).json({ message: 'Error fetching books from the database.' });
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+});
+
+
+
+
+
+// server.js
+
+// ... [existing imports and configurations]
+
+// Middleware to check if the authenticated user has access
+async function hasAccess(req, res, next) {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        // This should not happen if isAuthenticated middleware is used correctly
+        return res.status(401).json({ message: 'Unauthorized: Please log in.' });
+    }
+
+    let client;
+    try {
+        client = await pool.connect();
+
+        // Query to check the has_access flag for the user
+        const result = await client.query('SELECT has_access FROM users WHERE id = $1', [userId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const user = result.rows[0];
+
+        if (user.has_access) {
+            // User has access; proceed to the next middleware or route handler
+            return next();
+        } else {
+            // User does not have access; respond with Forbidden status
+            return res.status(403).json({ message: 'Forbidden: You do not have access to upload books.' });
+        }
+    } catch (error) {
+        console.error('Error checking user access:', error);
+        return res.status(500).json({ message: 'Internal server error while checking access permissions.' });
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+}
+
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* DONT DELETE
+this is for granting access to the api service
+
+
+
+// grantUserAccess(1);
+
+// Function to update user's "has_access" to true
+async function grantUserAccess(userId) {
+    let client;
+    try {
+        client = await pool.connect();
+        const result = await client.query(
+            'UPDATE users SET has_access = $1 WHERE id = $2 RETURNING *',
+            [true, userId]
+        );
+
+        if (result.rowCount === 0) {
+            console.log(`User with ID ${userId} not found`);
+            return { error: 'User not found' };
+        }
+
+        return result.rows[0]; // Return updated user data
+    } catch (error) {
+        console.error('Error updating user access:', error);
+        return { error: 'Internal server error' };
+    } finally {
+        if (client) {
+            client.release();
+        }
+    }
+}
+
+
+*/
