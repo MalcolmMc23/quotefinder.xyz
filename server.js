@@ -8,6 +8,8 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
 require('dotenv').config()
 const bcrypt = require('bcrypt')
+const sanitizeFilename = require('sanitize-filename');
+const rateLimit = require('express-rate-limit');
 
 
 
@@ -268,6 +270,11 @@ app.get('/api/profile', isAuthenticated, async (req, res) => {
     }
 });
 
+/*
+ 2nd 
+
+*/
+
 app.post('/api/findQuote', isAuthenticated, async (req, res) => {
 
     console.log("hello world")
@@ -315,16 +322,38 @@ app.post('/api/addQuote', isAuthenticated, async (req, res) => {
 // Set up storage for uploaded files using Multer
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, '/uploads/');
-        // Ensure the upload path directory exists
+        const uploadPath = path.join(__dirname, 'uploads');
+        // Ensure the upload directory exists
         fs.mkdirSync(uploadPath, { recursive: true });
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        // Use the original file name
-        cb(null, file.originalname);
+        // Access the bookName from the form data
+        const { bookName } = req.body;
+        console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!%!%!%!%!%!%!%!%!%!%!%" + bookName);
+        if (!bookName || bookName.trim() === '') {
+            // Reject the file if bookName is missing
+            return cb(new Error('Book name is required to upload the PDF.'), false);
+        }
+
+        // Sanitize the book name to remove any invalid characters
+        const sanitizedBookName = sanitizeFilename(bookName.trim());
+
+        // Extract the original file extension
+        const extension = path.extname(file.originalname).toLowerCase();
+
+        // Ensure the file is a PDF
+        if (extension !== '.pdf') {
+            return cb(new Error('Only PDF files are allowed!'), false);
+        }
+
+        // Create the new filename
+        const newFilename = `${sanitizedBookName}${extension}`;
+
+        cb(null, newFilename);
     }
 });
+
 
 // Set up file filter to accept only PDFs
 const fileFilter = (req, file, cb) => {
@@ -335,17 +364,47 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Create a Multer instance with the storage engine and file filter
-const upload = multer({ storage: storage, fileFilter: fileFilter });
+// Initialize multer with storage, file filter, and file size limit
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: { fileSize: 10 * 1024 * 1024 } // 5 MB limit
+});
+
+// Rate limiter for /upload-pdf to prevent abuse
+const uploadLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 upload requests per windowMs
+    message: 'Too many uploads from this IP, please try again after 15 minutes.'
+});
 
 // Define a route for file uploads
-app.post('/upload-pdf', upload.single('pdfFile'), (req, res) => {
-    if (req.file) {
-        res.send("PDF uploaded successfully!");
-    } else {
-        res.status(400).send("No PDF file uploaded.");
+app.post('/upload-pdf', isAuthenticated, uploadLimiter, upload.single('pdfFile'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).send("No PDF file uploaded.");
     }
-});
+
+    const { bookName } = req.body;
+
+    if (!bookName || bookName.trim() === '') {
+        // Optionally, delete the uploaded file if bookName is missing
+        fs.unlinkSync(req.file.path);
+        return res.status(400).send("Book name is required.");
+    }
+
+    // Normalize and sanitize the book name
+    const normalizedBookName = sanitizeFilename(bookName.trim());
+
+    // Get the user ID from the session
+    const userId = req.session.userId || (req.user && req.user.id);
+
+    if (!userId) {
+        // This should not happen if isAuthenticated middleware works correctly
+        // But it's good to have an extra check
+        fs.unlinkSync(req.file.path);
+        return res.status(401).send("Unauthorized: User not logged in.");
+    }
+})
 
 
 

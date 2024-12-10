@@ -13,12 +13,14 @@
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^7.4.1",
     "express-session": "^1.18.1",
     "multer": "^1.4.5-lts.1",
     "openai": "^4.57.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfjs-dist": "^4.6.82",
-    "pg": "^8.13.0"
+    "pg": "^8.13.0",
+    "sanitize-filename": "^1.6.3"
   }
 }

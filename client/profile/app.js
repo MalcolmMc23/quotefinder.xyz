@@ -153,9 +153,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     const findQuoteButton = document.getElementById('findQuoteButton');
-    findQuoteButton.addEventListener('click', function () {
-        console.log('clicked')
+    findQuoteButton.addEventListener('click', async function () {
+        try {
+            // Show loading indicator
+
+            // Send a POST request to the server to fetch a quote
+            const response = await fetch('/api/findQuote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Received quote:', data);
+
+            // Display the quote on the webpage
+            displayQuote(data.quote);
+        } catch (error) {
+            console.error('Error fetching quote:', error);
+            alert('Failed to fetch quote. Please try again later.');
+        } finally {
+            // Hide loading indicator
+        }
     });
+
 
 
     const submitButton = document.getElementById('submitButton');
@@ -174,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Sending quote data:', quoteData);  // Log the data to verify
 
             // API call to submit the quote
-            fetch('https://banana.quotefinder.xyz/api/quotes', {
+            fetch('https://quotefinder.xyz/api/quotes', {
                 // fetch('http://localhost:3000/api/addQuote', {
                 method: 'POST',
                 headers: {
@@ -200,4 +226,94 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         }
     });
+
+
+
+
+    //************************** PDF file handling ************************
+
+    const fileUploadInput = document.getElementById('fileUpload');
+    const saveFileButton = document.getElementById('saveFile');
+    const bookNameInput = document.getElementById('bookName');
+
+    saveFileButton.disabled = true;
+
+    function updateSaveFileButtonState() {
+        const isFileSelected = fileUploadInput.files && fileUploadInput.files.length > 0;
+        const isBookNameProvided = bookNameInput.value.trim() !== '';
+
+        // Enable the Save File button only if both conditions are true
+        saveFileButton.disabled = !(isFileSelected && isBookNameProvided);
+    }
+    // Event listeners for changes in file input and book name input
+    fileUploadInput.addEventListener('change', updateSaveFileButtonState);
+    bookNameInput.addEventListener('input', updateSaveFileButtonState);
+
+    saveFileButton.addEventListener('click', async function () {
+        try {
+            // Check if a file has been selected
+            if (fileUploadInput.files && fileUploadInput.files.length > 0) {
+                const file = fileUploadInput.files[0];
+                const bookName = bookNameInput.value.trim();
+
+                // Create FormData and append the file with the key 'pdfFile'
+                const formData = new FormData();
+                formData.append('pdfFile', file);
+                formData.append('bookName', bookName);
+
+                // Create an XMLHttpRequest to monitor upload progress
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/upload-pdf', true);
+
+                // Set up a handler for the progress event
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        const percentComplete = ((event.loaded / event.total) * 100).toFixed(2);
+                        console.log('working on progress')
+                    }
+                };
+
+                // Set up a handler for when the request finishes
+                xhr.onload = function () {
+                    if (xhr.status === 201) {
+                        const result = JSON.parse(xhr.responseText);
+                        console.log(result.message); // "PDF uploaded and book saved successfully!"
+
+                        // Print "Hello World" to the console
+                        console.log('Hello World');
+
+                    } else {
+                        const errorText = xhr.responseText;
+                        alert(errorText || 'Failed to upload PDF.', 'error');
+                    }
+                    // Hide progress after completion
+                };
+
+                // Set up a handler for errors
+                xhr.onerror = function () {
+                    throw new Error("xhr onError")
+                };
+
+                // Send the request
+                xhr.send(formData);
+
+                // Show initial progress
+                alert('Upload started...');
+            } else {
+                throw new Error('Please select a file and enter a book name before saving.');
+            }
+        } catch (error) {
+            console.error('Error saving file:', error);
+            alert(error.message || 'An error occurred while saving the file.');
+            // showMessage(error.message || 'An error occurred while saving the file.', 'error');
+        }
+    });
+
 });
+
+
+
+//************* end of PDF file handling ************************
+
+
+
