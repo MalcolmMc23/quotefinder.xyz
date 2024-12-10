@@ -277,3 +277,34 @@ a {
         width: 80%;
     }
 }
+
+
+
+
+
+#books-list {
+    margin-top: 20px;
+}
+.book-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+.book-name {
+    font-weight: bold;
+}
+.upload-date {
+    color: #666;
+    font-size: 0.9em;
+}
+.download-button {
+    margin-top: 5px;
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #4285F4;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 3px;
+}
+.download-button:hover {
+    background-color: #3367D6;
+}

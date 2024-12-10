@@ -271,6 +271,7 @@ app.get('/api/profile', isAuthenticated, async (req, res) => {
 });
 
 /*
+ !
  2nd 
 
 */
@@ -319,156 +320,107 @@ app.post('/api/addQuote', isAuthenticated, async (req, res) => {
 });
 
 
-// Set up storage for uploaded files using Multer
+// Multer storage configuration
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, 'uploads');
-        // Ensure the upload directory exists
-        fs.mkdirSync(uploadPath, { recursive: true });
-        cb(null, uploadPath);
+        // Specify the directory to save uploaded files
+        cb(null, 'uploads/');
     },
     filename: function (req, file, cb) {
-        // Access the bookName from the form data
-        const { bookName } = req.body;
-        console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%!%!%!%!%!%!%!%!%!%!%!%" + bookName);
-        if (!bookName || bookName.trim() === '') {
-            // Reject the file if bookName is missing
-            return cb(new Error('Book name is required to upload the PDF.'), false);
-        }
-
-        // Sanitize the book name to remove any invalid characters
-        const sanitizedBookName = sanitizeFilename(bookName.trim());
-
-        // Extract the original file extension
-        const extension = path.extname(file.originalname).toLowerCase();
-
-        // Ensure the file is a PDF
-        if (extension !== '.pdf') {
-            return cb(new Error('Only PDF files are allowed!'), false);
-        }
-
-        // Create the new filename
-        const newFilename = `${sanitizedBookName}${extension}`;
-
-        cb(null, newFilename);
+        // The filename will be set in the route handler based on the book name
+        cb(null, file.originalname); // Temporary name; will be renamed later
     }
 });
 
-
-// Set up file filter to accept only PDFs
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-        cb(null, true);
-    } else {
-        cb(new Error('Only PDF files are allowed!'), false);
-    }
-};
-
-// Initialize multer with storage, file filter, and file size limit
+// Initialize Multer with the storage configuration
 const upload = multer({
     storage: storage,
-    fileFilter: fileFilter,
-    limits: { fileSize: 10 * 1024 * 1024 } // 5 MB limit
-});
-
-// Rate limiter for /upload-pdf to prevent abuse
-const uploadLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // Limit each IP to 10 upload requests per windowMs
-    message: 'Too many uploads from this IP, please try again after 15 minutes.'
-});
-
-// Define a route for file uploads
-app.post('/upload-pdf', isAuthenticated, uploadLimiter, upload.single('pdfFile'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send("No PDF file uploaded.");
-    }
-
-    const { bookName } = req.body;
-
-    if (!bookName || bookName.trim() === '') {
-        // Optionally, delete the uploaded file if bookName is missing
-        fs.unlinkSync(req.file.path);
-        return res.status(400).send("Book name is required.");
-    }
-
-    // Normalize and sanitize the book name
-    const normalizedBookName = sanitizeFilename(bookName.trim());
-
-    // Get the user ID from the session
-    const userId = req.session.userId || (req.user && req.user.id);
-
-    if (!userId) {
-        // This should not happen if isAuthenticated middleware works correctly
-        // But it's good to have an extra check
-        fs.unlinkSync(req.file.path);
-        return res.status(401).send("Unauthorized: User not logged in.");
-    }
-})
-
-
-
-
-
-// Start the server
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* DONT DELETE
-this is for granting access to the api service
-
-
-
-// grantUserAccess(1);
-
-// Function to update user's "has_access" to true
-async function grantUserAccess(userId) {
-    let client;
-    try {
-        client = await pool.connect();
-        const result = await client.query(
-            'UPDATE users SET has_access = $1 WHERE id = $2 RETURNING *',
-            [true, userId]
-        );
-
-        if (result.rowCount === 0) {
-            console.log(`User with ID ${userId} not found`);
-            return { error: 'User not found' };
+    fileFilter: function (req, file, cb) {
+        // Accept only PDF files
+        const filetypes = /pdf/;
+        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = filetypes.test(file.mimetype);
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb(new Error('Only PDF files are allowed!'));
         }
+    },
+    limits: { fileSize: 10 * 1024 * 1024 } // 10 MB limit (optional)
+}).single('pdfFile'); // Expecting a single file with field name 'pdfFile'
 
-        return result.rows[0]; // Return updated user data
+// Function to send data to PostgreSQL database
+async function sendToDB(fileData, userId) {
+    const { fileName, fileBuffer } = fileData;
+
+    const insertQuery = `
+        INSERT INTO books (user_id, name, pdf_data)
+        VALUES ($1, $2, $3)
+        RETURNING id, name, upload_date;
+    `;
+
+    try {
+        const res = await pool.query(insertQuery, [userId, fileName, fileBuffer]);
+        console.log('Book inserted:', res.rows[0]);
+        return res.rows[0];
     } catch (error) {
-        console.error('Error updating user access:', error);
-        return { error: 'Internal server error' };
-    } finally {
-        if (client) {
-            client.release();
+        if (error.code === '23505') { // Unique violation
+            console.error(`Duplicate entry for user_id ${userId} with book name "${fileName}".`);
+            throw new Error('A book with this name already exists for this user.');
+        } else {
+            console.error('Error inserting book into database:', error);
+            throw new Error('An unexpected error occurred while saving the book.');
         }
     }
 }
 
+// Ensure the uploads directory exists
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
 
-*/
+// Route to handle PDF upload
+app.post('/upload-pdf', isAuthenticated, hasAccess, (req, res) => {
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            // Multer-specific errors
+            console.error('Multer error:', err);
+            return res.status(500).json({ message: err.message });
+        } else if (err) {
+            // Other errors
+            console.error('Error:', err);
+            return res.status(400).json({ message: err.message });
+        }
+
+        // Check if file and bookName are present
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded.' });
+        }
+        if (!req.body.bookName || req.body.bookName.trim() === '') {
+            // Delete the uploaded file since bookName is missing
+            fs.unlinkSync(req.file.path);
+            return res.status(400).json({ message: 'Book name is required.' });
+        }
+
+        // Sanitize the book name to prevent security issues
+        const bookName = sanitizeFilename(req.body.bookName.trim());
+        if (!bookName) {
+            fs.unlinkSync(req.file.path);
+            return res.status(400).json({ message: 'Invalid book name provided.' });
+        }
+
+        const fileExt = path.extname(req.file.originalname).toLowerCase();
+        const newFileName = `${bookName}${fileExt}`;
+        const newFilePath = path.join(uploadsDir, newFileName);
+
+        // Rename the file to the book name
+        fs.rename(req.file.path, newFilePath, function (renameErr) {
+            if (renameErr) {
+                console.error('Error renaming file:', renameErr);
+                return res.status(500).json({ message: 'Error processing file.' });
+            }
+
+            // Read the renamed file
+            fs.readFile(newFilePath, async (readErr, data) => {
+   

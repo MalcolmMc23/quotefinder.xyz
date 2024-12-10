@@ -45,7 +45,7 @@
             <p>has_access: <span id="access-status"></span></p>
         </div>
     
-        <div class="input-section">
+        <div id="inputSection" class="input-section" style="display: none;">
             <input type="text" id="userInput" placeholder="Enter text here">
             <!-- Add the submit button -->
             <button id="submitButton">Submit</button>
@@ -55,7 +55,16 @@
             <input type="file" id="fileUpload">
             <button id="saveFile">Save File</button>
             <input type="text" id="bookName" placeholder="Book Name">
+            <div id="books-list">
+                <h2>Your Uploaded Books</h2>
+                <div id="books-container">
+                    <!-- Books will be dynamically inserted here -->
+                </div>
+            </div>
         </div>
+       
+
+     
     </main>
 
     <!-- Logout Confirmation Modal -->

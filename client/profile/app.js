@@ -17,9 +17,19 @@ window.onload = async function () {
         document.getElementById('user-email').textContent = user.email;
         document.getElementById('google-id').textContent = user.google_id;
         document.getElementById('created-at').textContent = new Date(user.created_at).toLocaleString();
+        document.getElementById('access-status').textContent = user.has_access
 
-        const hasAccessText = user.has_access
-        document.getElementById('access-status').textContent = hasAccessText;
+        const hasAccess = user.has_access;
+        const inputSection = document.getElementById('inputSection');
+        if (hasAccess) {
+            inputSection.style.display = 'block'; // Show the input section
+            fetchBooks();
+
+        } else {
+            inputSection.style.display = 'none'; // Hide the input sectio
+        }
+
+
     } catch (error) {
         console.error('Error fetching user profile:', error);
         // Optionally, redirect to login page or show an error message
@@ -275,23 +285,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Set up a handler for when the request finishes
                 xhr.onload = function () {
-                    if (xhr.status === 201) {
+                    if (xhr.status === 200 || xhr.status === 201) {
                         const result = JSON.parse(xhr.responseText);
                         console.log(result.message); // "PDF uploaded and book saved successfully!"
 
                         // Print "Hello World" to the console
+                        alert(result.message);
+
                         console.log('Hello World');
 
                     } else {
                         const errorText = xhr.responseText;
                         alert(errorText || 'Failed to upload PDF.', 'error');
+
                     }
                     // Hide progress after completion
                 };
 
                 // Set up a handler for errors
                 xhr.onerror = function () {
-                    throw new Error("xhr onError")
+                    console.error("An error occurred during the transaction");
+                    alert('An error occurred during the upload.');
                 };
 
                 // Send the request
@@ -303,17 +317,4 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error('Please select a file and enter a book name before saving.');
             }
         } catch (error) {
-            console.error('Error saving file:', error);
-            alert(error.message || 'An error occurred while saving the file.');
-            // showMessage(error.message || 'An error occurred while saving the file.', 'error');
-        }
-    });
-
-});
-
-
-
-//************* end of PDF file handling ************************
-
-
-
+            console.error('Err
