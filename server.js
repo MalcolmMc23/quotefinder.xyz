@@ -12,8 +12,6 @@ const sanitizeFilename = require('sanitize-filename');
 const rateLimit = require('express-rate-limit');
 
 
-
-
 // Function to normalize email addresses (specifically for Gmail)
 function normalizeEmail(email) {
     const [localPart, domain] = email.split('@');
@@ -346,7 +344,7 @@ const upload = multer({
             cb(new Error('Only PDF files are allowed!'));
         }
     },
-    limits: { fileSize: 10 * 1024 * 1024 } // 10 MB limit (optional)
+    limits: { fileSize: 100 * 1024 * 1024 } // 100 MB limit (optional)
 }).single('pdfFile'); // Expecting a single file with field name 'pdfFile'
 
 // Function to send data to PostgreSQL database
@@ -479,13 +477,6 @@ app.get('/api/books', isAuthenticated, async (req, res) => {
 });
 
 
-
-
-
-// server.js
-
-// ... [existing imports and configurations]
-
 // Middleware to check if the authenticated user has access
 async function hasAccess(req, res, next) {
     const userId = req.session.userId;
@@ -553,7 +544,7 @@ app.listen(port, () => {
 
 
 
-/* DONT DELETE
+/*! DONT DELETE
 this is for granting access to the api service
 
 
